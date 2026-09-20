@@ -1,0 +1,485 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ lead.name }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Lead Details
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>{{ lead.name }}</h1>
+        <p>Lead details and customer requirements.</p>
+    </div>
+
+    <div class="form-actions">
+        {% if request.user.role != "VIEWER" %}
+        <a href="{% url 'lead_edit' lead.pk %}" class="btn btn-primary">
+            Edit Lead
+        </a>
+        {% endif %}
+        {% if request.user.role == "ADMIN" or request.user.role == "MANAGER" %}
+        <a href="{% url 'lead_delete' lead.pk %}" class="btn btn-light">
+            Delete
+        </a>
+        {% endif %}
+
+        <a href="{% url 'lead_list' %}" class="btn btn-light">
+            Back to Leads
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- CUSTOMER INFORMATION -->
+
+<div class="card">
+
+    <h2>Customer Information</h2>
+
+    <div class="details-grid">
+
+        <div class="detail-item">
+            <span>Name</span>
+            <strong>{{ lead.name }}</strong>
+        </div>
+
+        <div class="detail-item">
+            <span>Phone</span>
+            <strong>{{ lead.phone }}</strong>
+        </div>
+
+        <div class="detail-item">
+            <span>Email</span>
+            <strong>{{ lead.email|default:"—" }}</strong>
+        </div>
+
+        <div class="detail-item">
+            <span>Source</span>
+            <strong>{{ lead.get_source_display }}</strong>
+        </div>
+
+
+        <!-- STATUS UPDATE -->
+
+        <div class="detail-item">
+
+            <span>Status</span>
+
+            {% if request.user.role != "VIEWER" %}
+
+            <form method="post" action="{% url 'lead_status_update' lead.pk %}">
+
+                {% csrf_token %}
+
+                <div style="display:flex; gap:8px; align-items:center;">
+
+                    <select name="status">
+
+                        {% for value, label in lead.Status.choices %}
+
+                        <option value="{{ value }}" {% if lead.status == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <button type="submit" class="btn btn-primary">
+                        Update
+                    </button>
+
+                </div>
+
+            </form>
+
+            {% else %}
+
+            <strong>
+                {{ lead.get_status_display }}
+            </strong>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ASSIGNED USER -->
+
+        <div class="detail-item">
+
+            <span>Assigned To</span>
+
+            <strong>
+
+                {% if lead.assigned_to %}
+                {{ lead.assigned_to }}
+                {% else %}
+                Unassigned
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PROPERTY REQUIREMENT -->
+
+<div class="card">
+
+    <h2>Property Requirement</h2>
+
+    <div class="details-grid">
+
+        <div class="detail-item">
+
+            <span>Interested Project</span>
+
+            <strong>
+
+                {% if lead.interested_project %}
+                {{ lead.interested_project }}
+                {% else %}
+                —
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Property Type</span>
+
+            <strong>
+                {{ lead.preferred_property_type|default:"—" }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Preferred Location</span>
+
+            <strong>
+                {{ lead.preferred_location|default:"—" }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>BHK</span>
+
+            <strong>
+
+                {% if lead.bhk %}
+                {{ lead.bhk }} BHK
+                {% else %}
+                —
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Minimum Budget</span>
+
+            <strong>
+
+                {% if lead.budget_min %}
+                ₹{{ lead.budget_min }}
+                {% else %}
+                —
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Maximum Budget</span>
+
+            <strong>
+
+                {% if lead.budget_max %}
+                ₹{{ lead.budget_max }}
+                {% else %}
+                —
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- REQUIREMENT -->
+
+<div class="card">
+
+    <h2>Requirement</h2>
+
+    <div class="text-content">
+
+        {% if lead.requirement %}
+
+        {{ lead.requirement|linebreaks }}
+
+        {% else %}
+
+        <span>—</span>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- FOLLOW UP -->
+
+<div class="card">
+
+    <h2>Follow-up</h2>
+
+    <div class="details-grid">
+
+        <div class="detail-item">
+
+            <span>Next Follow-up</span>
+
+            <strong>
+
+                {% if lead.next_follow_up %}
+
+                {{ lead.next_follow_up|date:"d M Y, h:i A" }}
+
+                {% else %}
+
+                No follow-up scheduled
+
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Created</span>
+
+            <strong>
+                {{ lead.created_at|date:"d M Y, h:i A" }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Last Updated</span>
+
+            <strong>
+                {{ lead.updated_at|date:"d M Y, h:i A" }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- NOTES -->
+
+<div class="card">
+
+    <h2>Notes</h2>
+
+    <div class="text-content">
+
+        {% if lead.notes %}
+
+        {{ lead.notes|linebreaks }}
+
+        {% else %}
+
+        <span>No notes added.</span>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ACTIVITY HISTORY -->
+
+<div class="section-title">
+
+    <h2>Activity History</h2>
+
+</div>
+
+
+<div class="card">
+
+    {% if activities %}
+
+    {% for activity in activities %}
+
+    <div class="activity-item">
+
+        <div>
+
+            <strong>
+                {{ activity.get_activity_type_display }}
+            </strong>
+
+            {% if activity.subject %}
+
+            <span>
+                — {{ activity.subject }}
+            </span>
+
+            {% endif %}
+
+        </div>
+
+
+        {% if activity.description %}
+
+        <p>
+            {{ activity.description }}
+        </p>
+
+        {% endif %}
+
+
+        <small>
+
+            {{ activity.activity_date|date:"d M Y, h:i A" }}
+
+            {% if activity.created_by %}
+
+            ·
+            {{ activity.created_by.get_full_name|default:activity.created_by.username }}
+
+            {% endif %}
+
+        </small>
+
+
+        <!-- ACTIVITY ACTIONS -->
+
+        <div class="form-actions">
+            {% if request.user.role != "VIEWER" %}
+            <a href="{% url 'lead_activity_edit' lead.pk activity.pk %}" class="btn btn-light">
+                Edit
+            </a>
+            {% endif %}
+            {% if request.user.role == "ADMIN" or request.user.role == "MANAGER" %}
+            <a href="{% url 'lead_activity_delete' lead.pk activity.pk %}" class="btn btn-light">
+                Delete
+            </a>
+            {% endif %} 
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+    {% else %}
+
+    <div class="empty-state">
+
+        No activities recorded yet.
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ADD ACTIVITY -->
+{% if request.user.role != "VIEWER" %}
+<div class="section-title">
+
+    <h2>Add Activity</h2>
+
+</div>
+
+
+<div class="card form-card">
+    
+
+    <form method="post" action="{% url 'lead_activity_create' lead.pk %}">
+
+        {% csrf_token %}
+
+        <div class="form-grid">
+
+            {% for field in activity_form %}
+
+            <div class="form-group">
+
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.errors %}
+
+                <div class="field-error">
+                    {{ field.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button type="submit" class="btn btn-primary">
+                Add Activity
+            </button>
+
+        </div>
+
+    </form>
+    
+</div>
+{% endif %}
+{% endblock %}

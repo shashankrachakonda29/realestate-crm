@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Dashboard</h1>
+        <p>Overview of your property inventory.</p>
+    </div>
+
+</div>
+
+
+<!-- MAIN STATISTICS -->
+
+<div class="dashboard-stats">
+
+    <div class="stat-card">
+        <div class="stat-icon">🏢</div>
+
+        <div>
+            <span>Total Developers</span>
+            <strong>{{ total_developers }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">🏗️</div>
+
+        <div>
+            <span>Total Projects</span>
+            <strong>{{ total_projects }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">🏠</div>
+
+        <div>
+            <span>Total Inventory</span>
+            <strong>{{ total_inventory }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+
+        <div>
+            <span>Available</span>
+            <strong>{{ available_inventory }}</strong>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- INVENTORY STATUS -->
+
+<div class="section-title">
+    <h2>Inventory Status</h2>
+</div>
+
+
+<div class="dashboard-stats">
+
+    <div class="stat-card">
+        <div class="stat-icon">🟢</div>
+
+        <div>
+            <span>Available</span>
+            <strong>{{ available_inventory }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">🟡</div>
+
+        <div>
+            <span>Blocked</span>
+            <strong>{{ blocked_inventory }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">🔵</div>
+
+        <div>
+            <span>Booked</span>
+            <strong>{{ booked_inventory }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">🔴</div>
+
+        <div>
+            <span>Sold</span>
+            <strong>{{ sold_inventory }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">🟠</div>
+
+        <div>
+            <span>On Hold</span>
+            <strong>{{ on_hold_inventory }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">⚪</div>
+
+        <div>
+            <span>Not Available</span>
+            <strong>{{ not_available_inventory }}</strong>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- QUICK ACTIONS -->
+
+<div class="section-title">
+    <h2>Quick Actions</h2>
+</div>
+
+
+<div class="quick-actions">
+
+    <a
+        href="{% url 'developer_list' %}"
+        class="quick-card">
+
+        <span>🏢</span>
+
+        <div>
+            <strong>Developers</strong>
+            <small>Manage developers</small>
+        </div>
+
+    </a>
+
+
+    <a
+        href="{% url 'location_list' %}"
+        class="quick-card">
+
+        <span>📍</span>
+
+        <div>
+            <strong>Locations</strong>
+            <small>Manage locations</small>
+        </div>
+
+    </a>
+
+
+    <a
+        href="{% url 'project_list' %}"
+        class="quick-card">
+
+        <span>🏗️</span>
+
+        <div>
+            <strong>Projects</strong>
+            <small>Manage projects</small>
+        </div>
+
+    </a>
+
+
+    <a
+        href="{% url 'inventory_list' %}"
+        class="quick-card">
+
+        <span>🏠</span>
+
+        <div>
+            <strong>Inventory</strong>
+            <small>Manage inventory</small>
+        </div>
+
+    </a>
+
+</div>
+<!-- LEAD STATUS -->
+
+<div class="section-title">
+    <h2>Lead Status</h2>
+</div>
+
+<div class="dashboard-stats">
+
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div>
+            <span>Total Leads</span>
+            <strong>{{ lead_stats.total }}</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">🆕</div>
+        <div>
+            <span>New</span>
+            <strong>{{ lead_stats.new }}</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">📞</div>
+        <div>
+            <span>Contacted</span>
+            <strong>{{ lead_stats.contacted }}</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">❤️</div>
+        <div>
+            <span>Interested</span>
+            <strong>{{ lead_stats.interested }}</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">📍</div>
+        <div>
+            <span>Site Visits</span>
+            <strong>{{ lead_stats.site_visit }}</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">🤝</div>
+        <div>
+            <span>Negotiation</span>
+            <strong>{{ lead_stats.negotiation }}</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">🎉</div>
+        <div>
+            <span>Booked</span>
+            <strong>{{ lead_stats.booked }}</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">⏸️</div>
+        <div>
+            <span>On Hold</span>
+            <strong>{{ lead_stats.on_hold }}</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">❌</div>
+        <div>
+            <span>Lost</span>
+            <strong>{{ lead_stats.lost }}</strong>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

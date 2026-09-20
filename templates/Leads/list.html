@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}
+Leads | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Leads
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Leads</h1>
+        <p>Manage your property leads.</p>
+    </div>
+
+    {% if request.user.role != "VIEWER" %}
+        <a href="{% url 'lead_create' %}" class="btn btn-primary">
+            + Add Lead
+        </a>
+    {% endif %}
+
+</div>
+
+
+<!-- SEARCH & FILTERS -->
+
+<div class="card">
+
+    <form method="get">
+
+        <div class="form-grid">
+
+            <!-- SEARCH -->
+
+            <div class="form-group">
+
+                <label for="search">
+                    Search
+                </label>
+
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Name, phone, email, location, project..."
+                >
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label for="status">
+                    Status
+                </label>
+
+                <select id="status" name="status">
+
+                    <option value="">
+                        All Statuses
+                    </option>
+
+                    {% for value, label in statuses %}
+
+                        <option
+                            value="{{ value }}"
+                            {% if selected_status == value %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ label }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- SOURCE -->
+
+            <div class="form-group">
+
+                <label for="source">
+                    Source
+                </label>
+
+                <select id="source" name="source">
+
+                    <option value="">
+                        All Sources
+                    </option>
+
+                    {% for value, label in sources %}
+
+                        <option
+                            value="{{ value }}"
+                            {% if selected_source == value %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ label }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- PROPERTY TYPE -->
+
+            <div class="form-group">
+
+                <label for="preferred_property_type">
+                    Property Type
+                </label>
+
+                <select
+                    id="preferred_property_type"
+                    name="preferred_property_type"
+                >
+
+                    <option value="">
+                        All Property Types
+                    </option>
+
+                    {% for property_type in property_types %}
+
+                        <option
+                            value="{{ property_type }}"
+                            {% if selected_property_type == property_type %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ property_type }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Search / Filter
+            </button>
+
+            <a
+                href="{% url 'lead_list' %}"
+                class="btn btn-light"
+            >
+                Clear
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- LEAD LIST -->
+
+<div class="card">
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>Lead List</h2>
+
+            <p>
+                {{ leads|length }}
+                lead{{ leads|length|pluralize }}
+                found
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if leads %}
+
+        <div class="table-responsive">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Source</th>
+                        <th>Status</th>
+                        <th>Project</th>
+                        <th>Location</th>
+                        <th>Budget</th>
+                        <th>Assigned To</th>
+                        <th>Follow Up</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for lead in leads %}
+
+                        <tr>
+
+                            <!-- NAME -->
+
+                            <td>
+
+                                <strong>
+                                    {{ lead.name }}
+                                </strong>
+
+                            </td>
+
+
+                            <!-- PHONE -->
+
+                            <td>
+                                {{ lead.phone }}
+                            </td>
+
+
+                            <!-- SOURCE -->
+
+                            <td>
+                                {{ lead.get_source_display }}
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+                                {{ lead.get_status_display }}
+                            </td>
+
+
+                            <!-- PROJECT -->
+
+                            <td>
+
+                                {% if lead.interested_project %}
+
+                                    {{ lead.interested_project }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- LOCATION -->
+
+                            <td>
+                                {{ lead.preferred_location|default:"—" }}
+                            </td>
+
+
+                            <!-- BUDGET -->
+
+                            <td>
+
+                                {% if lead.budget_min or lead.budget_max %}
+
+                                    {% if lead.budget_min %}
+                                        ₹{{ lead.budget_min }}
+                                    {% endif %}
+
+                                    {% if lead.budget_min and lead.budget_max %}
+                                        -
+                                    {% endif %}
+
+                                    {% if lead.budget_max %}
+                                        ₹{{ lead.budget_max }}
+                                    {% endif %}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ASSIGNED TO -->
+
+                            <td>
+
+                                {% if lead.assigned_to %}
+
+                                    {{ lead.assigned_to }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- FOLLOW UP -->
+
+                            <td>
+
+                                {% if lead.next_follow_up %}
+
+                                    {{ lead.next_follow_up|date:"d M Y, h:i A" }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <a
+                                    href="{% url 'lead_detail' lead.pk %}"
+                                    class="btn btn-light"
+                                >
+                                    View
+                                </a>
+
+
+                                {% if request.user.role != "VIEWER" %}
+
+                                    <a
+                                        href="{% url 'lead_edit' lead.pk %}"
+                                        class="btn btn-light"
+                                    >
+                                        Edit
+                                    </a>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No leads found</h3>
+
+            <p>
+                Try changing your search or filters.
+            </p>
+
+            {% if request.user.role != "VIEWER" %}
+
+                <a
+                    href="{% url 'lead_create' %}"
+                    class="btn btn-primary"
+                >
+                    + Add Lead
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

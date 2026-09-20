@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ location.name }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Location Details
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>{{ location.name }}</h1>
+        <p>
+            {{ location.city }}, {{ location.state }}
+        </p>
+    </div>
+
+    <div class="actions">
+
+        <a
+            href="{% url 'location_edit' location.pk %}"
+            class="btn btn-primary">
+            Edit
+        </a>
+
+        <a
+            href="{% url 'location_list' %}"
+            class="btn btn-light">
+            Back
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="card detail-card">
+
+    <div class="detail-grid">
+
+        <div>
+
+            <span class="detail-label">
+                Location
+            </span>
+
+            <strong>
+                {{ location.name }}
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span class="detail-label">
+                Status
+            </span>
+
+            {% if location.is_active %}
+
+                <span class="badge badge-active">
+                    Active
+                </span>
+
+            {% else %}
+
+                <span class="badge badge-inactive">
+                    Inactive
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <div>
+
+            <span class="detail-label">
+                City
+            </span>
+
+            {{ location.city }}
+
+        </div>
+
+
+        <div>
+
+            <span class="detail-label">
+                State
+            </span>
+
+            {{ location.state }}
+
+        </div>
+
+
+        <div>
+
+            <span class="detail-label">
+                Pincode
+            </span>
+
+            {{ location.pincode|default:"—" }}
+
+        </div>
+
+
+        <div>
+
+            <span class="detail-label">
+                Latitude
+            </span>
+
+            {{ location.latitude|default:"—" }}
+
+        </div>
+
+
+        <div>
+
+            <span class="detail-label">
+                Longitude
+            </span>
+
+            {{ location.longitude|default:"—" }}
+
+        </div>
+
+
+        <div>
+
+            <span class="detail-label">
+                Google Maps
+            </span>
+
+            {% if location.google_maps_url %}
+
+                <a
+                    href="{{ location.google_maps_url }}"
+                    target="_blank"
+                    rel="noopener">
+                    Open Google Maps
+                </a>
+
+            {% else %}
+
+                —
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="full-width">
+
+            <span class="detail-label">
+                Description
+            </span>
+
+            {{ location.description|default:"—" }}
+
+        </div>
+
+    </div>
+
+
+    {% if confirm_delete %}
+
+        <div class="delete-box">
+
+            <strong>
+                Are you sure you want to delete this location?
+            </strong>
+
+            <form
+                method="post"
+                action="{% url 'location_delete' location.pk %}">
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-danger">
+                    Yes, Delete
+                </button>
+
+                <a
+                    href="{% url 'location_detail' location.pk %}"
+                    class="btn btn-light">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    {% else %}
+
+        <div class="detail-footer">
+
+            <a
+                href="{% url 'location_delete' location.pk %}"
+                class="btn btn-danger">
+                Delete Location
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

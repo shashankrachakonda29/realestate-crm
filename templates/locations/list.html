@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}
+Locations | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Locations
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Locations</h1>
+        <p>Manage property locations.</p>
+    </div>
+
+    <a
+        href="{% url 'location_create' %}"
+        class="btn btn-primary">
+        + Add Location
+    </a>
+
+</div>
+
+
+<div class="card">
+
+    <form
+        method="get"
+        class="search-bar">
+
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="Search locations..."
+        >
+
+        <button
+            type="submit"
+            class="btn btn-secondary">
+            Search
+        </button>
+
+        {% if search %}
+
+            <a
+                href="{% url 'location_list' %}"
+                class="btn btn-light">
+                Clear
+            </a>
+
+        {% endif %}
+
+    </form>
+
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Location</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Pincode</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for location in locations %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ location.name }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        {{ location.city }}
+                    </td>
+
+                    <td>
+                        {{ location.state }}
+                    </td>
+
+                    <td>
+                        {{ location.pincode|default:"—" }}
+                    </td>
+
+                    <td>
+
+                        {% if location.is_active %}
+
+                            <span class="badge badge-active">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge badge-inactive">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <div class="actions">
+
+                            <a
+                                href="{% url 'location_detail' location.pk %}"
+                                class="action-link">
+                                View
+                            </a>
+
+                            <a
+                                href="{% url 'location_edit' location.pk %}"
+                                class="action-link">
+                                Edit
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        class="empty-state">
+
+                        No locations found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

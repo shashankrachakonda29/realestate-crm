@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ title }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>{{ title }}</h1>
+        <p>Enter developer information.</p>
+    </div>
+
+    <a
+        href="{% url 'developer_list' %}"
+        class="btn btn-light">
+        ← Back
+    </a>
+
+</div>
+
+
+<div class="card form-card">
+
+    <form method="post">
+
+        {% csrf_token %}
+
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>
+                    Developer Name *
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    required
+                    value="{{ developer.name|default:'' }}"
+                    placeholder="Enter developer name"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Contact Person
+                </label>
+
+                <input
+                    type="text"
+                    name="contact_person"
+                    value="{{ developer.contact_person|default:'' }}"
+                    placeholder="Contact person"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Phone
+                </label>
+
+                <input
+                    type="text"
+                    name="phone"
+                    value="{{ developer.phone|default:'' }}"
+                    placeholder="Phone number"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ developer.email|default:'' }}"
+                    placeholder="Email address"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Website
+                </label>
+
+                <input
+                    type="url"
+                    name="website"
+                    value="{{ developer.website|default:'' }}"
+                    placeholder="https://example.com"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Status
+                </label>
+
+                <label class="checkbox">
+
+                    <input
+                        type="checkbox"
+                        name="is_active"
+                        {% if developer is None or developer.is_active %}
+                            checked
+                        {% endif %}
+                    >
+
+                    Active
+
+                </label>
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label>
+                    Address
+                </label>
+
+                <textarea
+                    name="address"
+                    rows="3"
+                    placeholder="Developer address"
+                >{{ developer.address|default:'' }}</textarea>
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    name="description"
+                    rows="4"
+                    placeholder="Developer description"
+                >{{ developer.description|default:'' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="{% url 'developer_list' %}"
+                class="btn btn-light">
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary">
+                Save Developer
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

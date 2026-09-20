@@ -1,0 +1,332 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}Property CRM{% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar" id="sidebar">
+
+            <!-- Logo -->
+            <div class="logo">
+
+                <div class="logo-mark">
+                    🏠
+                </div>
+
+                <div class="logo-text">
+                    <strong>Property CRM</strong>
+                    <small>Real Estate Management</small>
+                </div>
+
+            </div>
+
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+
+                <div class="nav-section-title">
+                    MAIN
+                </div>
+
+
+                <!-- Dashboard -->
+
+                <a href="{% url 'dashboard' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+
+                    <span class="nav-icon">📊</span>
+
+                    <span class="nav-text">
+                        Dashboard
+                    </span>
+
+                </a>
+
+
+                <div class="nav-section-title">
+                    PROPERTY
+                </div>
+
+
+                <!-- Developers -->
+
+                <a href="{% url 'developer_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'developer_list' %}active{% endif %}">
+
+                    <span class="nav-icon">🏢</span>
+
+                    <span class="nav-text">
+                        Developers
+                    </span>
+
+                </a>
+
+
+                <!-- Locations -->
+
+                <a href="{% url 'location_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'location_list' %}active{% endif %}">
+
+                    <span class="nav-icon">📍</span>
+
+                    <span class="nav-text">
+                        Locations
+                    </span>
+
+                </a>
+
+
+                <!-- Projects -->
+
+                <a href="{% url 'project_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}">
+
+                    <span class="nav-icon">🏗️</span>
+
+                    <span class="nav-text">
+                        Projects
+                    </span>
+
+                </a>
+
+
+                <!-- Inventory -->
+
+                <a href="{% url 'inventory_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'inventory_list' %}active{% endif %}">
+
+                    <span class="nav-icon">🏠</span>
+
+                    <span class="nav-text">
+                        Inventory
+                    </span>
+
+                </a>
+
+
+                <div class="nav-section-title">
+                    CRM
+                </div>
+
+
+                <!-- Leads -->
+
+                <a href="{% url 'lead_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'lead_list' %}active{% endif %}">
+                    <span>👥</span>
+                    Leads
+                </a>
+
+                <!-- Customers -->
+
+                <a href="#" class="nav-item">
+
+                    <span class="nav-icon">🤝</span>
+
+                    <span class="nav-text">
+                        Customers
+                    </span>
+
+                    <span class="coming-soon">
+                        Soon
+                    </span>
+
+                </a>
+
+
+                <!-- Reports -->
+
+                <a href="#" class="nav-item">
+
+                    <span class="nav-icon">📈</span>
+
+                    <span class="nav-text">
+                        Reports
+                    </span>
+
+                    <span class="coming-soon">
+                        Soon
+                    </span>
+
+                </a>
+
+            </nav>
+
+
+            <!-- Sidebar Bottom -->
+
+            <div class="sidebar-bottom">
+
+                <a href="#" class="nav-item">
+
+                    <span class="nav-icon">
+                        ⚙️
+                    </span>
+
+                    <span class="nav-text">
+                        Settings
+                    </span>
+
+                </a>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================= MAIN ================= -->
+
+        <main class="main">
+
+
+            <!-- ================= TOPBAR ================= -->
+
+            <header class="topbar">
+
+                <!-- Mobile Menu -->
+
+                <button class="mobile-menu-button" onclick="toggleSidebar()">
+
+                    ☰
+
+                </button>
+
+
+                <!-- Page Heading -->
+
+                <div class="page-heading">
+
+                    <div class="page-title">
+
+                        {% block page_heading %}
+                        Dashboard
+                        {% endblock %}
+
+                    </div>
+
+                    <div class="breadcrumb">
+
+                        Property CRM
+
+                        {% block breadcrumb %}
+                        {% endblock %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- Topbar Right -->
+
+                <div class="topbar-right">
+
+
+                    <!-- Notifications -->
+
+                    <button class="icon-button" title="Notifications">
+
+                        🔔
+
+                        <span class="notification-dot"></span>
+
+                    </button>
+
+
+                    <!-- User -->
+
+                    <div class="user-menu">
+
+                        <div class="avatar">
+                            A
+                        </div>
+
+                        <div class="user-info">
+
+                            <strong>
+                                Admin
+                            </strong>
+
+                            <span>
+                                Administrator
+                            </span>
+
+                        </div>
+
+                        <span class="user-arrow">
+                            ▾
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- ================= CONTENT ================= -->
+
+            <section class="content">
+
+                {% block content %}
+
+                {% endblock %}
+
+            </section>
+
+
+        </main>
+
+    </div>
+
+
+    <!-- Mobile Sidebar Overlay -->
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()">
+    </div>
+
+
+    <script src="{% static 'js/app.js' %}"></script>
+
+
+    <script>
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById("sidebar");
+
+            const overlay =
+                document.getElementById("sidebarOverlay");
+
+            sidebar.classList.toggle("mobile-open");
+
+            overlay.classList.toggle("active");
+
+        }
+
+    </script>
+
+
+    {% block extra_js %}
+    {% endblock %}
+
+</body>
+
+</html>

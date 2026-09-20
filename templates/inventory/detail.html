@@ -1,0 +1,499 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ inventory_item.unit_number }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Inventory Details
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>{{ inventory_item.unit_number }}</h1>
+        <p>
+            {{ inventory_item.project.name }}
+        </p>
+    </div>
+
+    <div class="actions">
+
+        <a
+            href="{% url 'inventory_edit' inventory_item.pk %}"
+            class="btn btn-primary">
+            Edit
+        </a>
+
+        <a
+            href="{% url 'inventory_list' %}"
+            class="btn btn-light">
+            ← Back
+        </a>
+
+    </div>
+
+</div>
+
+
+{% if confirm_delete %}
+
+<div class="card">
+
+    <h2>Delete Inventory</h2>
+
+    <p>
+        Are you sure you want to delete
+        <strong>{{ inventory_item.unit_number }}</strong>?
+    </p>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <button
+            type="submit"
+            class="btn btn-danger">
+            Yes, Delete
+        </button>
+
+        <a
+            href="{% url 'inventory_detail' inventory_item.pk %}"
+            class="btn btn-light">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+{% else %}
+
+
+<!-- BASIC INFORMATION -->
+
+<div class="card form-card">
+
+    <div class="section-heading">
+        <h2>Basic Information</h2>
+    </div>
+
+    <div class="detail-grid">
+
+        <div>
+            <span>Project</span>
+            <strong>{{ inventory_item.project.name }}</strong>
+        </div>
+
+        <div>
+            <span>Developer</span>
+            <strong>
+                {{ inventory_item.project.developer.name }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Location</span>
+            <strong>
+                {{ inventory_item.project.location.name }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Property Type</span>
+            <strong>
+                {{ inventory_item.get_property_type_display }}
+            </strong>
+        </div>
+
+        <div>
+            <span>BHK</span>
+            <strong>
+                {{ inventory_item.bhk|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Status</span>
+            <strong>
+                {{ inventory_item.get_status_display }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PROPERTY DETAILS -->
+
+<div class="card form-card">
+
+    <div class="section-heading">
+        <h2>Property Details</h2>
+    </div>
+
+    <div class="detail-grid">
+
+        <div>
+            <span>Plot Size (Sq. Yds)</span>
+            <strong>
+                {{ inventory_item.plot_size_sq_yards|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Plot Size (Sq. Ft)</span>
+            <strong>
+                {{ inventory_item.plot_size_sq_ft|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Saleable Area</span>
+            <strong>
+                {{ inventory_item.saleable_area_sq_ft|default:"—" }} SFT
+            </strong>
+        </div>
+
+        <div>
+            <span>Built-up Area</span>
+            <strong>
+                {{ inventory_item.built_up_area_sq_ft|default:"—" }} SFT
+            </strong>
+        </div>
+
+        <div>
+            <span>Extra Built-up Area</span>
+            <strong>
+                {{ inventory_item.extra_built_up_area_sq_ft|default:"—" }} SFT
+            </strong>
+        </div>
+
+        <div>
+            <span>Unit Size</span>
+            <strong>
+                {{ inventory_item.unit_size_sq_ft|default:"—" }} SFT
+            </strong>
+        </div>
+
+        <div>
+            <span>Facing</span>
+            <strong>
+                {{ inventory_item.facing|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Unit Facing</span>
+            <strong>
+                {{ inventory_item.unit_facing|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Floors</span>
+            <strong>
+                {{ inventory_item.floors|default:"—" }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PRICING -->
+
+<div class="card form-card">
+
+    <div class="section-heading">
+        <h2>Pricing</h2>
+    </div>
+
+    <div class="detail-grid">
+
+        <div>
+            <span>Current Price</span>
+            <strong>
+                ₹{{ inventory_item.current_price|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Basic Sale Price</span>
+            <strong>
+                ₹{{ inventory_item.basic_sale_price|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Basic Sale Price / SFT</span>
+            <strong>
+                ₹{{ inventory_item.basic_sale_price_per_sq_ft|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>GST Amount</span>
+            <strong>
+                ₹{{ inventory_item.gst_amount|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Amenities Charges</span>
+            <strong>
+                ₹{{ inventory_item.amenities_charges|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Facing Charges</span>
+            <strong>
+                ₹{{ inventory_item.facing_charges|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Discount</span>
+            <strong>
+                ₹{{ inventory_item.discount|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Booking Amount</span>
+            <strong>
+                ₹{{ inventory_item.booking_amount|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Price / SFT Incl. GST</span>
+            <strong>
+                ₹{{ inventory_item.price_per_sq_ft_incl_gst|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Total Unit Cost</span>
+            <strong>
+                ₹{{ inventory_item.total_unit_cost|default:"—" }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CP COMMISSION -->
+
+<div class="card form-card">
+
+    <div class="section-heading">
+        <h2>Channel Partner Commission</h2>
+    </div>
+
+    <div class="detail-grid">
+
+        <div>
+            <span>Commission</span>
+            <strong>
+                {{ inventory_item.cp_commission_percent|default:"—" }}%
+            </strong>
+        </div>
+
+        <div>
+            <span>Offer Valid Till</span>
+            <strong>
+                {{ inventory_item.offer_valid_till|default:"—" }}
+            </strong>
+        </div>
+
+        <div class="full-width">
+
+            <span>Commission Terms</span>
+
+            <strong>
+                {{ inventory_item.commission_terms|default:"—" }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PROJECT INFORMATION -->
+
+<div class="card form-card">
+
+    <div class="section-heading">
+        <h2>Project Information</h2>
+    </div>
+
+    <div class="detail-grid">
+
+        <div>
+            <span>Possession</span>
+            <strong>
+                {{ inventory_item.possession_date|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>RERA Number</span>
+            <strong>
+                {{ inventory_item.rera_number|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Available Units</span>
+            <strong>
+                {{ inventory_item.available_units|default:"—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Source</span>
+            <strong>
+                {{ inventory_item.source|default:"—" }}
+            </strong>
+        </div>
+
+        <div class="full-width">
+
+            <span>Payment Plan</span>
+
+            <strong>
+                {{ inventory_item.payment_plan|default:"—" }}
+            </strong>
+
+        </div>
+
+        <div class="full-width">
+
+            <span>Amenities</span>
+
+            <strong>
+                {{ inventory_item.amenities|default:"—" }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- DOCUMENTS -->
+
+<div class="card form-card">
+
+    <div class="section-heading">
+        <h2>Documents & Links</h2>
+    </div>
+
+    <div class="detail-grid">
+
+        {% if inventory_item.brochure_url %}
+        <div>
+            <span>Brochure</span>
+            <a
+                href="{{ inventory_item.brochure_url }}"
+                target="_blank">
+                Open Brochure
+            </a>
+        </div>
+        {% endif %}
+
+
+        {% if inventory_item.price_sheet_url %}
+        <div>
+            <span>Price Sheet</span>
+            <a
+                href="{{ inventory_item.price_sheet_url }}"
+                target="_blank">
+                Open Price Sheet
+            </a>
+        </div>
+        {% endif %}
+
+
+        {% if inventory_item.inventory_sheet_url %}
+        <div>
+            <span>Inventory Sheet</span>
+            <a
+                href="{{ inventory_item.inventory_sheet_url }}"
+                target="_blank">
+                Open Inventory Sheet
+            </a>
+        </div>
+        {% endif %}
+
+
+        {% if inventory_item.website_url %}
+        <div>
+            <span>Website</span>
+            <a
+                href="{{ inventory_item.website_url }}"
+                target="_blank">
+                Open Website
+            </a>
+        </div>
+        {% endif %}
+
+
+        {% if inventory_item.google_maps_url %}
+        <div>
+            <span>Google Maps</span>
+            <a
+                href="{{ inventory_item.google_maps_url }}"
+                target="_blank">
+                Open Map
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- NOTES -->
+
+<div class="card form-card">
+
+    <div class="section-heading">
+        <h2>Notes</h2>
+    </div>
+
+    <p>
+        {{ inventory_item.notes|default:"No notes added." }}
+    </p>
+
+</div>
+
+
+<!-- DELETE -->
+
+<div class="card">
+
+    <a
+        href="{% url 'inventory_delete' inventory_item.pk %}"
+        class="btn btn-danger">
+        Delete Inventory
+    </a>
+
+</div>
+
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ title }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>{{ title }}</h1>
+        <p>Enter customer and property requirement details.</p>
+    </div>
+
+</div>
+
+
+<div class="card form-card">
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+
+            <div class="delete-box">
+                {{ form.non_field_errors }}
+            </div>
+
+        {% endif %}
+
+
+        <div class="form-grid">
+
+            {% for field in form %}
+
+                <div class="form-group">
+
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.errors %}
+
+                        <div class="field-error">
+                            {{ field.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="{% url 'lead_list' %}"
+                class="btn btn-light"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Save Lead
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

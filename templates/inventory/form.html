@@ -1,0 +1,1252 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ title }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>{{ title }}</h1>
+        <p>Add property inventory details.</p>
+    </div>
+
+    <a href="{% url 'inventory_list' %}" class="btn btn-light">
+        ← Back
+    </a>
+
+</div>
+
+
+<form method="post">
+
+    {% csrf_token %}
+
+
+    <!-- ================================================= -->
+    <!-- BASIC INFORMATION -->
+    <!-- ================================================= -->
+
+    <div class="card form-card">
+
+        <div class="section-heading">
+
+            <h2>Basic Information</h2>
+
+            <p>
+                Select the project and identify the property unit.
+            </p>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <!-- PROJECT -->
+
+            <div class="form-group full-width">
+
+                <label for="project">
+                    Project *
+                </label>
+
+                <select
+                    name="project"
+                    id="project"
+                    required
+                >
+
+                    <option value="">
+                        Select Project
+                    </option>
+
+                    {% for project in projects %}
+
+                        <option
+                            value="{{ project.id }}"
+                            {% if inventory_item.project_id == project.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ project.name }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- UNIT NUMBER -->
+
+            <div class="form-group">
+
+                <label>
+                    Unit Number *
+                </label>
+
+                <input
+                    type="text"
+                    name="unit_number"
+                    required
+                    value="{{ inventory_item.unit_number|default:'' }}"
+                    placeholder="Example: Villa 101"
+                >
+
+            </div>
+
+
+            <!-- PROPERTY TYPE -->
+
+            <div class="form-group">
+
+                <label>
+                    Property Type *
+                </label>
+
+                <select
+                    name="property_type"
+                    required
+                >
+
+                    <option value="">
+                        Select Property Type
+                    </option>
+
+                    {% for value, label in property_types %}
+
+                        <option
+                            value="{{ value }}"
+                            {% if inventory_item.property_type == value %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ label }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- BHK -->
+
+            <div class="form-group">
+
+                <label>
+                    BHK
+                </label>
+
+                <input
+                    type="number"
+                    name="bhk"
+                    min="0"
+                    value="{{ inventory_item.bhk|default:'' }}"
+                    placeholder="Example: 4"
+                >
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label>
+                    Status
+                </label>
+
+                <select name="status">
+
+                    {% for value, label in statuses %}
+
+                        <option
+                            value="{{ value }}"
+                            {% if inventory_item.status == value %}
+                                selected
+                            {% elif inventory_item is None and value == "AVAILABLE" %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ label }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- PROPERTY DETAILS -->
+    <!-- ================================================= -->
+
+    <div class="card form-card">
+
+        <div class="section-heading">
+
+            <h2>Property Details</h2>
+
+            <p>
+                Area, facing and structural information.
+            </p>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <!-- PLOT SIZE SQ YARDS -->
+
+            <div class="form-group">
+
+                <label>
+                    Plot Size (Sq. Yds)
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="plot_size_sq_yards"
+                    value="{{ inventory_item.plot_size_sq_yards|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- PLOT SIZE SQ FT -->
+
+            <div class="form-group">
+
+                <label>
+                    Plot Size (Sq. Ft)
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="plot_size_sq_ft"
+                    value="{{ inventory_item.plot_size_sq_ft|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- SALEABLE AREA -->
+
+            <div class="form-group">
+
+                <label>
+                    Saleable Area (SFT)
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="saleable_area_sq_ft"
+                    value="{{ inventory_item.saleable_area_sq_ft|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- BUILT UP AREA -->
+
+            <div class="form-group">
+
+                <label>
+                    Built-up Area (SFT)
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="built_up_area_sq_ft"
+                    value="{{ inventory_item.built_up_area_sq_ft|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- EXTRA BUILT UP AREA -->
+
+            <div class="form-group">
+
+                <label>
+                    Extra Built-up Area (SFT)
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="extra_built_up_area_sq_ft"
+                    value="{{ inventory_item.extra_built_up_area_sq_ft|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- UNIT SIZE -->
+
+            <div class="form-group">
+
+                <label>
+                    Unit Size (SFT)
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="unit_size_sq_ft"
+                    value="{{ inventory_item.unit_size_sq_ft|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- FACING -->
+
+            <div class="form-group">
+
+                <label>
+                    Facing
+                </label>
+
+                <input
+                    type="text"
+                    name="facing"
+                    value="{{ inventory_item.facing|default:'' }}"
+                    placeholder="East"
+                >
+
+            </div>
+
+
+            <!-- UNIT FACING -->
+
+            <div class="form-group">
+
+                <label>
+                    Unit Facing
+                </label>
+
+                <input
+                    type="text"
+                    name="unit_facing"
+                    value="{{ inventory_item.unit_facing|default:'' }}"
+                    placeholder="East"
+                >
+
+            </div>
+
+
+            <!-- FLOORS -->
+
+            <div class="form-group full-width">
+
+                <label>
+                    Floors
+                </label>
+
+                <input
+                    type="text"
+                    name="floors"
+                    value="{{ inventory_item.floors|default:'' }}"
+                    placeholder="Example: G+2 / Triplex"
+                >
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- PRICING -->
+    <!-- ================================================= -->
+
+    <div class="card form-card">
+
+        <div class="section-heading">
+
+            <h2>Pricing</h2>
+
+            <p>
+                Enter the current pricing and charges.
+            </p>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <!-- CURRENT PRICE -->
+
+            <div class="form-group">
+
+                <label>
+                    Current Price
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="current_price"
+                    value="{{ inventory_item.current_price|default:'' }}"
+                    placeholder="₹"
+                >
+
+            </div>
+
+
+            <!-- BASIC SALE PRICE -->
+
+            <div class="form-group">
+
+                <label>
+                    Basic Sale Price
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="basic_sale_price"
+                    value="{{ inventory_item.basic_sale_price|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- BASIC SALE PRICE / SFT -->
+
+            <div class="form-group">
+
+                <label>
+                    Basic Sale Price / SFT
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="basic_sale_price_per_sq_ft"
+                    value="{{ inventory_item.basic_sale_price_per_sq_ft|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- GST -->
+
+            <div class="form-group">
+
+                <label>
+                    GST Amount
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="gst_amount"
+                    value="{{ inventory_item.gst_amount|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- AMENITIES -->
+
+            <div class="form-group">
+
+                <label>
+                    Amenities Charges
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="amenities_charges"
+                    value="{{ inventory_item.amenities_charges|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- FACING CHARGES -->
+
+            <div class="form-group">
+
+                <label>
+                    Facing Charges
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="facing_charges"
+                    value="{{ inventory_item.facing_charges|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- TOTAL UNIT COST -->
+
+            <div class="form-group">
+
+                <label>
+                    Total Unit Cost
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="total_unit_cost"
+                    id="total_unit_cost"
+                    value="{{ inventory_item.total_unit_cost|default:'' }}"
+                    readonly
+                >
+
+            </div>
+
+
+            <!-- DISCOUNT -->
+
+            <div class="form-group">
+
+                <label>
+                    Discount
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="discount"
+                    value="{{ inventory_item.discount|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- UNIT PRICE -->
+
+            <div class="form-group">
+
+                <label>
+                    Unit Price
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="unit_price"
+                    value="{{ inventory_item.unit_price|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- PRICE / SFT -->
+
+            <div class="form-group">
+
+                <label>
+                    Price / SFT Incl. GST
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="price_per_sq_ft_incl_gst"
+                    id="price_per_sq_ft_incl_gst"
+                    value="{{ inventory_item.price_per_sq_ft_incl_gst|default:'' }}"
+                    readonly
+                >
+
+            </div>
+
+
+            <!-- BOOKING AMOUNT -->
+
+            <div class="form-group">
+
+                <label>
+                    Booking Amount
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="booking_amount"
+                    value="{{ inventory_item.booking_amount|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- AVAILABLE UNITS -->
+
+            <div class="form-group">
+
+                <label>
+                    Available Units
+                </label>
+
+                <input
+                    type="number"
+                    min="0"
+                    name="available_units"
+                    value="{{ inventory_item.available_units|default:'' }}"
+                >
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- CP COMMISSION -->
+    <!-- ================================================= -->
+
+    <div class="card form-card">
+
+        <div class="section-heading">
+
+            <h2>Channel Partner Commission</h2>
+
+            <p>
+                Commission and booking information.
+            </p>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <!-- COMMISSION -->
+
+            <div class="form-group">
+
+                <label>
+                    CP Commission (%)
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="cp_commission_percent"
+                    value="{{ inventory_item.cp_commission_percent|default:'' }}"
+                    placeholder="Example: 2.00"
+                >
+
+            </div>
+
+
+            <!-- OFFER VALID TILL -->
+
+            <div class="form-group">
+
+                <label>
+                    Offer Valid Till
+                </label>
+
+                <input
+                    type="date"
+                    name="offer_valid_till"
+                    value="{{ inventory_item.offer_valid_till|date:'Y-m-d' }}"
+                >
+
+            </div>
+
+
+            <!-- COMMISSION TERMS -->
+
+            <div class="form-group full-width">
+
+                <label>
+                    Commission Terms
+                </label>
+
+                <textarea
+                    name="commission_terms"
+                    rows="4"
+                    placeholder="Commission payment terms..."
+                >{{ inventory_item.commission_terms|default:'' }}</textarea>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- PROJECT INFORMATION -->
+    <!-- ================================================= -->
+
+    <div class="card form-card">
+
+        <div class="section-heading">
+
+            <h2>Project Information</h2>
+
+            <p>
+                RERA, possession, amenities and payment details.
+            </p>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <!-- POSSESSION -->
+
+            <div class="form-group">
+
+                <label>
+                    Possession Date
+                </label>
+
+                <input
+                    type="date"
+                    name="possession_date"
+                    value="{{ inventory_item.possession_date|date:'Y-m-d' }}"
+                >
+
+            </div>
+
+
+            <!-- RERA -->
+
+            <div class="form-group">
+
+                <label>
+                    RERA Number
+                </label>
+
+                <input
+                    type="text"
+                    name="rera_number"
+                    value="{{ inventory_item.rera_number|default:'' }}"
+                >
+
+            </div>
+
+
+            <!-- SOURCE -->
+
+            <div class="form-group">
+
+                <label>
+                    Source
+                </label>
+
+                <input
+                    type="text"
+                    name="source"
+                    value="{{ inventory_item.source|default:'' }}"
+                    placeholder="Developer / Sales Team / Website"
+                >
+
+            </div>
+
+
+            <!-- DATE RECEIVED -->
+
+            <div class="form-group">
+
+                <label>
+                    Date Received
+                </label>
+
+                <input
+                    type="date"
+                    name="date_received"
+                    value="{{ inventory_item.date_received|date:'Y-m-d' }}"
+                >
+
+            </div>
+
+
+            <!-- PAYMENT PLAN -->
+
+            <div class="form-group full-width">
+
+                <label>
+                    Payment Plan
+                </label>
+
+                <textarea
+                    name="payment_plan"
+                    rows="4"
+                    placeholder="Payment schedule..."
+                >{{ inventory_item.payment_plan|default:'' }}</textarea>
+
+            </div>
+
+
+            <!-- AMENITIES -->
+
+            <div class="form-group full-width">
+
+                <label>
+                    Amenities
+                </label>
+
+                <textarea
+                    name="amenities"
+                    rows="4"
+                    placeholder="Clubhouse, Swimming Pool, Gym..."
+                >{{ inventory_item.amenities|default:'' }}</textarea>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- DOCUMENTS & LINKS -->
+    <!-- ================================================= -->
+
+    <div class="card form-card">
+
+        <div class="section-heading">
+
+            <h2>Documents & Links</h2>
+
+            <p>
+                Store links to project documents and websites.
+            </p>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <!-- BROCHURE -->
+
+            <div class="form-group full-width">
+
+                <label>
+                    Brochure URL
+                </label>
+
+                <input
+                    type="url"
+                    name="brochure_url"
+                    value="{{ inventory_item.brochure_url|default:'' }}"
+                    placeholder="https://..."
+                >
+
+            </div>
+
+
+            <!-- PRICE SHEET -->
+
+            <div class="form-group full-width">
+
+                <label>
+                    Price Sheet URL
+                </label>
+
+                <input
+                    type="url"
+                    name="price_sheet_url"
+                    value="{{ inventory_item.price_sheet_url|default:'' }}"
+                    placeholder="https://..."
+                >
+
+            </div>
+
+
+            <!-- INVENTORY SHEET -->
+
+            <div class="form-group full-width">
+
+                <label>
+                    Inventory Sheet URL
+                </label>
+
+                <input
+                    type="url"
+                    name="inventory_sheet_url"
+                    value="{{ inventory_item.inventory_sheet_url|default:'' }}"
+                    placeholder="https://..."
+                >
+
+            </div>
+
+
+            <!-- WEBSITE -->
+
+            <div class="form-group">
+
+                <label>
+                    Website URL
+                </label>
+
+                <input
+                    type="url"
+                    name="website_url"
+                    value="{{ inventory_item.website_url|default:'' }}"
+                    placeholder="https://..."
+                >
+
+            </div>
+
+
+            <!-- GOOGLE MAPS -->
+
+            <div class="form-group">
+
+                <label>
+                    Google Maps URL
+                </label>
+
+                <input
+                    type="url"
+                    name="google_maps_url"
+                    value="{{ inventory_item.google_maps_url|default:'' }}"
+                    placeholder="https://maps.google.com/..."
+                >
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- NOTES -->
+    <!-- ================================================= -->
+
+    <div class="card form-card">
+
+        <div class="section-heading">
+
+            <h2>Notes</h2>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <textarea
+                name="notes"
+                rows="5"
+                placeholder="Additional inventory notes..."
+            >{{ inventory_item.notes|default:'' }}</textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- FORM ACTIONS -->
+    <!-- ================================================= -->
+
+    <div class="form-actions">
+
+        <a
+            href="{% url 'inventory_list' %}"
+            class="btn btn-light"
+        >
+            Cancel
+        </a>
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Save Inventory
+        </button>
+
+    </div>
+
+
+</form>
+
+
+<!-- ================================================= -->
+<!-- PRICE CALCULATION -->
+<!-- ================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        const basicSalePrice =
+            document.querySelector(
+                '[name="basic_sale_price"]'
+            );
+
+
+        const gstAmount =
+            document.querySelector(
+                '[name="gst_amount"]'
+            );
+
+
+        const amenitiesCharges =
+            document.querySelector(
+                '[name="amenities_charges"]'
+            );
+
+
+        const facingCharges =
+            document.querySelector(
+                '[name="facing_charges"]'
+            );
+
+
+        const discount =
+            document.querySelector(
+                '[name="discount"]'
+            );
+
+
+        const unitSize =
+            document.querySelector(
+                '[name="unit_size_sq_ft"]'
+            );
+
+
+        const totalUnitCost =
+            document.getElementById(
+                "total_unit_cost"
+            );
+
+
+        const pricePerSqFt =
+            document.getElementById(
+                "price_per_sq_ft_incl_gst"
+            );
+
+
+        function numberValue(element) {
+
+            if (!element) {
+                return 0;
+            }
+
+            return Number(element.value) || 0;
+
+        }
+
+
+        function calculatePrice() {
+
+
+            const basic =
+                numberValue(
+                    basicSalePrice
+                );
+
+
+            const gst =
+                numberValue(
+                    gstAmount
+                );
+
+
+            const amenities =
+                numberValue(
+                    amenitiesCharges
+                );
+
+
+            const facing =
+                numberValue(
+                    facingCharges
+                );
+
+
+            const discountValue =
+                numberValue(
+                    discount
+                );
+
+
+            const size =
+                numberValue(
+                    unitSize
+                );
+
+
+            /*
+             * Total Unit Cost
+             *
+             * Basic Sale Price
+             * + GST
+             * + Amenities
+             * + Facing Charges
+             * - Discount
+             */
+
+            const total =
+                basic
+                + gst
+                + amenities
+                + facing
+                - discountValue;
+
+
+            if (totalUnitCost) {
+
+                totalUnitCost.value =
+                    total.toFixed(2);
+
+            }
+
+
+            /*
+             * Price / SFT
+             */
+
+            if (pricePerSqFt) {
+
+                if (size > 0) {
+
+                    pricePerSqFt.value =
+                        (
+                            total / size
+                        ).toFixed(2);
+
+                } else {
+
+                    pricePerSqFt.value = "";
+
+                }
+
+            }
+
+
+            console.log(
+                "Basic:",
+                basic
+            );
+
+
+            console.log(
+                "GST:",
+                gst
+            );
+
+
+            console.log(
+                "Amenities:",
+                amenities
+            );
+
+
+            console.log(
+                "Facing:",
+                facing
+            );
+
+
+            console.log(
+                "Discount:",
+                discountValue
+            );
+
+
+            console.log(
+                "Unit Size:",
+                size
+            );
+
+
+            console.log(
+                "TOTAL:",
+                total
+            );
+
+
+        }
+
+
+        const calculationFields = [
+
+            basicSalePrice,
+
+            gstAmount,
+
+            amenitiesCharges,
+
+            facingCharges,
+
+            discount,
+
+            unitSize
+
+        ];
+
+
+        calculationFields.forEach(
+            function (field) {
+
+                if (field) {
+
+                    field.addEventListener(
+                        "input",
+                        calculatePrice
+                    );
+
+
+                    field.addEventListener(
+                        "change",
+                        calculatePrice
+                    );
+
+                }
+
+            }
+        );
+
+
+        calculatePrice();
+
+
+    }
+);
+
+</script>
+
+
+{% endblock %}
