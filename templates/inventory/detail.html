@@ -118,7 +118,9 @@ Inventory Details
         <div>
             <span>Status</span>
             <strong>
-                {{ inventory_item.get_status_display }}
+                <span class="status-badge status-{{ inventory_item.status|lower|cut:'_' }}">
+                    {{ inventory_item.get_status_display }}
+                </span>
             </strong>
         </div>
 

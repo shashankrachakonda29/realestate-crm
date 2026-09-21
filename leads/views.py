@@ -1,67 +1,106 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Q,Count
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from .forms import LeadForm, LeadActivityForm
-from .models import Lead,LeadActivity
-from django.utils import timezone
-from accounts.decorators import role_required
+from .models import Lead, LeadActivity
+
+from accounts.permissions import require_roles
+
 
 User = get_user_model()
-# ==========================================
-# Pipeline
-# =========================================
-def lead_pipeline(request):
-    leads = Lead.objects.all()
 
-    if request.user.role == User.Role.SALES:
 
-        leads = leads.filter(
-            assigned_to=request.user
+# =====================================================
+# LEAD ACCESS HELPER
+# =====================================================
+
+def get_sales_lead_queryset(user):
+
+    if user.role == User.Role.SALES:
+        return Lead.objects.filter(
+            assigned_to=user
         )
 
-    # Total leads
-    total_leads = Lead.objects.count()
+    return Lead.objects.all()
 
-    # Status-wise counts
+
+# =====================================================
+# LEAD ASSIGNMENT HELPER
+# =====================================================
+
+def can_assign_leads(user):
+    """
+    Only Admin and Manager can assign/reassign leads.
+    """
+
+    return (
+        user.is_authenticated
+        and user.role in [
+            User.Role.ADMIN,
+            User.Role.MANAGER,
+        ]
+    )
+
+
+# =====================================================
+# PIPELINE
+# =====================================================
+
+def lead_pipeline(request):
+
+    leads = get_sales_lead_queryset(
+        request.user
+    )
+
+    # -----------------------------------------
+    # Status counts
+    # -----------------------------------------
+
+    total_leads = leads.count()
+
     status_counts = {
-        "new": Lead.objects.filter(
+        "new": leads.filter(
             status=Lead.Status.NEW
         ).count(),
 
-        "contacted": Lead.objects.filter(
+        "contacted": leads.filter(
             status=Lead.Status.CONTACTED
         ).count(),
 
-        "interested": Lead.objects.filter(
+        "interested": leads.filter(
             status=Lead.Status.INTERESTED
         ).count(),
 
-        "site_visit": Lead.objects.filter(
+        "site_visit": leads.filter(
             status=Lead.Status.SITE_VISIT
         ).count(),
 
-        "negotiation": Lead.objects.filter(
+        "negotiation": leads.filter(
             status=Lead.Status.NEGOTIATION
         ).count(),
 
-        "booked": Lead.objects.filter(
+        "booked": leads.filter(
             status=Lead.Status.BOOKED
         ).count(),
 
-        "lost": Lead.objects.filter(
+        "lost": leads.filter(
             status=Lead.Status.LOST
         ).count(),
 
-        "on_hold": Lead.objects.filter(
+        "on_hold": leads.filter(
             status=Lead.Status.ON_HOLD
         ).count(),
     }
 
+    # -----------------------------------------
     # Today's follow-ups
+    # -----------------------------------------
+
     today = timezone.localdate()
 
-    today_followups = Lead.objects.filter(
+    today_followups = leads.filter(
         next_follow_up__date=today
     ).select_related(
         "assigned_to",
@@ -70,8 +109,11 @@ def lead_pipeline(request):
         "next_follow_up"
     )
 
+    # -----------------------------------------
     # Overdue follow-ups
-    overdue_followups = Lead.objects.filter(
+    # -----------------------------------------
+
+    overdue_followups = leads.filter(
         next_follow_up__lt=timezone.now()
     ).exclude(
         status__in=[
@@ -85,8 +127,11 @@ def lead_pipeline(request):
         "next_follow_up"
     )
 
+    # -----------------------------------------
     # Upcoming follow-ups
-    upcoming_followups = Lead.objects.filter(
+    # -----------------------------------------
+
+    upcoming_followups = leads.filter(
         next_follow_up__gt=timezone.now()
     ).select_related(
         "assigned_to",
@@ -111,36 +156,66 @@ def lead_pipeline(request):
     )
 
 
+# =====================================================
+# LIST
+# =====================================================
 
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+    "VIEWER",
+)
 def lead_list(request):
 
-    leads = Lead.objects.select_related(
+    # -----------------------------------------
+    # Base queryset
+    # -----------------------------------------
+
+    leads = get_sales_lead_queryset(
+        request.user
+    ).select_related(
         "assigned_to",
         "interested_project",
-    ).order_by("-created_at")
-    if request.user.role == User.Role.SALES:
+    ).order_by(
+        "-created_at"
+    )
 
-        leads = leads.filter(
-            assigned_to=request.user
-        )
+    # -----------------------------------------
+    # Search
+    # -----------------------------------------
 
-    search = request.GET.get("search", "").strip()
-    selected_status = request.GET.get("status", "")
-    selected_source = request.GET.get("source", "")
+    search = request.GET.get(
+        "search",
+        ""
+    ).strip()
+
+    selected_status = request.GET.get(
+        "status",
+        ""
+    )
+
+    selected_source = request.GET.get(
+        "source",
+        ""
+    )
+
     selected_property_type = request.GET.get(
         "preferred_property_type",
-        "",
+        ""
     )
+
     selected_assigned_to = request.GET.get(
         "assigned_to",
-        "",
+        ""
     )
 
-    # =========================================
-    # SEARCH
-    # =========================================
+    # -----------------------------------------
+    # SEARCH FILTER
+    # -----------------------------------------
 
     if search:
+
         leads = leads.filter(
             Q(name__icontains=search)
             | Q(phone__icontains=search)
@@ -152,45 +227,49 @@ def lead_list(request):
             | Q(interested_project__name__icontains=search)
         )
 
-    # =========================================
+    # -----------------------------------------
     # STATUS FILTER
-    # =========================================
+    # -----------------------------------------
 
     if selected_status:
+
         leads = leads.filter(
             status=selected_status
         )
 
-    # =========================================
+    # -----------------------------------------
     # SOURCE FILTER
-    # =========================================
+    # -----------------------------------------
 
     if selected_source:
+
         leads = leads.filter(
             source=selected_source
         )
 
-    # =========================================
+    # -----------------------------------------
     # PROPERTY TYPE FILTER
-    # =========================================
+    # -----------------------------------------
 
     if selected_property_type:
+
         leads = leads.filter(
             preferred_property_type__iexact=selected_property_type
         )
 
-    # =========================================
+    # -----------------------------------------
     # ASSIGNED USER FILTER
-    # =========================================
+    # -----------------------------------------
 
     if selected_assigned_to:
+
         leads = leads.filter(
             assigned_to_id=selected_assigned_to
         )
 
-    # =========================================
+    # -----------------------------------------
     # USERS
-    # =========================================
+    # -----------------------------------------
 
     users = User.objects.filter(
         is_active=True
@@ -199,45 +278,52 @@ def lead_list(request):
         "username",
     )
 
-    # =========================================
-    # CONTEXT
-    # =========================================
+    # -----------------------------------------
+    # STATUS COUNTS
+    # -----------------------------------------
+
     lead_status_counts = {
-    "total": Lead.objects.count(),
+        "total": leads.count(),
 
-    "new": Lead.objects.filter(
-        status=Lead.Status.NEW
-    ).count(),
+        "new": leads.filter(
+            status=Lead.Status.NEW
+        ).count(),
 
-    "contacted": Lead.objects.filter(
-        status=Lead.Status.CONTACTED
-    ).count(),
+        "contacted": leads.filter(
+            status=Lead.Status.CONTACTED
+        ).count(),
 
-    "interested": Lead.objects.filter(
-        status=Lead.Status.INTERESTED
-    ).count(),
+        "interested": leads.filter(
+            status=Lead.Status.INTERESTED
+        ).count(),
 
-    "site_visit": Lead.objects.filter(
-        status=Lead.Status.SITE_VISIT
-    ).count(),
+        "site_visit": leads.filter(
+            status=Lead.Status.SITE_VISIT
+        ).count(),
 
-    "negotiation": Lead.objects.filter(
-        status=Lead.Status.NEGOTIATION
-    ).count(),
+        "negotiation": leads.filter(
+            status=Lead.Status.NEGOTIATION
+        ).count(),
 
-    "booked": Lead.objects.filter(
-        status=Lead.Status.BOOKED
-    ).count(),
+        "booked": leads.filter(
+            status=Lead.Status.BOOKED
+        ).count(),
 
-    "on_hold": Lead.objects.filter(
-        status=Lead.Status.ON_HOLD
-    ).count(),
+        "on_hold": leads.filter(
+            status=Lead.Status.ON_HOLD
+        ).count(),
 
-    "lost": Lead.objects.filter(
-        status=Lead.Status.LOST
-    ).count(),
-}
+        "lost": leads.filter(
+            status=Lead.Status.LOST
+        ).count(),
+    }
+
+    # -----------------------------------------
+    # CONTEXT
+    # -----------------------------------------
+
     context = {
+
         "leads": leads,
 
         "search": search,
@@ -257,6 +343,7 @@ def lead_list(request):
         "users": users,
 
         "total_leads": leads.count(),
+
         "lead_status_counts": lead_status_counts,
 
         "property_types": [
@@ -272,24 +359,41 @@ def lead_list(request):
     return render(
         request,
         "leads/list.html",
-        context,
+        context
     )
+
+
 # =====================================================
 # CREATE
 # =====================================================
-@role_required("ADMIN", "MANAGER", "SALES")
+
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+)
 def lead_create(request):
 
     if request.method == "POST":
 
-        form = LeadForm(request.POST)
+        form = LeadForm(
+            request.POST,
+            user=request.user
+        )
 
         if form.is_valid():
 
-            lead = form.save(commit=False)
+            lead = form.save(
+                commit=False
+            )
 
-            if not can_assign_leads(request.user):
-                lead.assigned_to = None
+            # -----------------------------------------
+            # Sales automatically owns new lead
+            # -----------------------------------------
+
+            if request.user.role == User.Role.SALES:
+
+                lead.assigned_to = request.user
 
             lead.save()
 
@@ -300,7 +404,9 @@ def lead_create(request):
 
     else:
 
-        form = LeadForm()
+        form = LeadForm(
+            user=request.user
+        )
 
     return render(
         request,
@@ -314,15 +420,27 @@ def lead_create(request):
 # DETAIL
 # =====================================================
 
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+    "VIEWER",
+)
 def lead_detail(request, pk):
 
     lead = get_object_or_404(
-        Lead.objects.select_related(
+        get_sales_lead_queryset(
+            request.user
+        ).select_related(
             "assigned_to",
             "interested_project",
         ),
         pk=pk
     )
+
+    # -----------------------------------------
+    # Activities
+    # -----------------------------------------
 
     activities = lead.activities.select_related(
         "created_by"
@@ -330,6 +448,10 @@ def lead_detail(request, pk):
         "-activity_date",
         "-created_at",
     )
+
+    # -----------------------------------------
+    # Activity form
+    # -----------------------------------------
 
     activity_form = LeadActivityForm(
         initial={
@@ -339,6 +461,18 @@ def lead_detail(request, pk):
         }
     )
 
+    # -----------------------------------------
+    # Site visits
+    # -----------------------------------------
+
+    site_visits = lead.site_visits.select_related(
+        "project",
+        "assigned_to",
+    ).order_by(
+        "-visit_date",
+        "-visit_time",
+    )
+
     return render(
         request,
         "leads/detail.html",
@@ -346,24 +480,39 @@ def lead_detail(request, pk):
             "lead": lead,
             "activities": activities,
             "activity_form": activity_form,
+            "site_visits": site_visits,
         }
     )
 
-@role_required("ADMIN", "MANAGER", "SALES")
+
+# =====================================================
+# STATUS UPDATE
+# =====================================================
+
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+)
 def lead_status_update(request, pk):
 
     lead = get_object_or_404(
-        Lead,
+        get_sales_lead_queryset(
+            request.user
+        ),
         pk=pk
     )
 
     if request.method == "POST":
 
-        status = request.POST.get("status")
+        status = request.POST.get(
+            "status"
+        )
 
         valid_statuses = {
             value
-            for value, label in Lead.Status.choices
+            for value, label
+            in Lead.Status.choices
         }
 
         if status in valid_statuses:
@@ -381,11 +530,23 @@ def lead_status_update(request, pk):
         "lead_detail",
         pk=lead.pk
     )
-@role_required("ADMIN", "MANAGER", "SALES")
+
+
+# =====================================================
+# CREATE ACTIVITY
+# =====================================================
+
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+)
 def lead_activity_create(request, pk):
 
     lead = get_object_or_404(
-        Lead,
+        get_sales_lead_queryset(
+            request.user
+        ),
         pk=pk
     )
 
@@ -404,6 +565,7 @@ def lead_activity_create(request, pk):
             activity.lead = lead
 
             if request.user.is_authenticated:
+
                 activity.created_by = request.user
 
             activity.save()
@@ -417,14 +579,23 @@ def lead_activity_create(request, pk):
         "lead_detail",
         pk=lead.pk
     )
+
+
 # =====================================================
 # EDIT
 # =====================================================
-@role_required("ADMIN", "MANAGER", "SALES")
+
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+)
 def lead_edit(request, pk):
 
     lead = get_object_or_404(
-        Lead,
+        get_sales_lead_queryset(
+            request.user
+        ),
         pk=pk
     )
 
@@ -432,7 +603,8 @@ def lead_edit(request, pk):
 
         form = LeadForm(
             request.POST,
-            instance=lead
+            instance=lead,
+            user=request.user
         )
 
         if form.is_valid():
@@ -441,7 +613,11 @@ def lead_edit(request, pk):
                 commit=False
             )
 
-            if not can_assign_leads(request.user):
+            # -----------------------------------------
+            # Sales cannot reassign lead
+            # -----------------------------------------
+
+            if request.user.role == User.Role.SALES:
 
                 updated_lead.assigned_to = lead.assigned_to
 
@@ -455,7 +631,8 @@ def lead_edit(request, pk):
     else:
 
         form = LeadForm(
-            instance=lead
+            instance=lead,
+            user=request.user
         )
 
     return render(
@@ -467,11 +644,26 @@ def lead_edit(request, pk):
             "lead": lead,
         }
     )
-@role_required("ADMIN", "MANAGER", "SALES")
-def lead_activity_edit(request, pk, activity_id):
+
+# =====================================================
+# EDIT ACTIVITY
+# =====================================================
+
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+)
+def lead_activity_edit(
+    request,
+    pk,
+    activity_id
+):
 
     lead = get_object_or_404(
-        Lead,
+        get_sales_lead_queryset(
+            request.user
+        ),
         pk=pk
     )
 
@@ -514,8 +706,20 @@ def lead_activity_edit(request, pk, activity_id):
         }
     )
 
-@role_required("ADMIN", "MANAGER")
-def lead_activity_delete(request, pk, activity_id):
+
+# =====================================================
+# DELETE ACTIVITY
+# =====================================================
+
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+)
+def lead_activity_delete(
+    request,
+    pk,
+    activity_id
+):
 
     lead = get_object_or_404(
         Lead,
@@ -545,10 +749,16 @@ def lead_activity_delete(request, pk, activity_id):
             "activity": activity,
         }
     )
+
+
 # =====================================================
-# DELETE
+# DELETE LEAD
 # =====================================================
-@role_required("ADMIN", "MANAGER")
+
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+)
 def lead_delete(request, pk):
 
     lead = get_object_or_404(
@@ -570,13 +780,4 @@ def lead_delete(request, pk):
         {
             "lead": lead,
         }
-    )
-
-def can_assign_leads(user):
-    return (
-        user.is_authenticated
-        and user.role in [
-            User.Role.ADMIN,
-            User.Role.MANAGER,
-        ]
     )

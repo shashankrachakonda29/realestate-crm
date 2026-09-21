@@ -329,37 +329,37 @@ Inventory
 
                         {% if item.status == "AVAILABLE" %}
 
-                            <span class="badge badge-active">
+                            <span class="status-badge status-available">
                                 Available
                             </span>
 
                         {% elif item.status == "BLOCKED" %}
 
-                            <span class="badge badge-inactive">
+                            <span class="status-badge status-blocked">
                                 Blocked
                             </span>
 
                         {% elif item.status == "BOOKED" %}
 
-                            <span class="badge badge-inactive">
+                            <span class="status-badge status-booked">
                                 Booked
                             </span>
 
                         {% elif item.status == "SOLD" %}
 
-                            <span class="badge badge-inactive">
+                            <span class="status-badge status-sold">
                                 Sold
                             </span>
 
                         {% elif item.status == "ON_HOLD" %}
 
-                            <span class="badge badge-inactive">
+                            <span class="status-badge status-hold">
                                 On Hold
                             </span>
 
                         {% else %}
 
-                            <span class="badge badge-inactive">
+                            <span class="status-badge status-not-available">
                                 Not Available
                             </span>
 

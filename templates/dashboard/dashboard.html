@@ -1,287 +1,80 @@
 {% extends "base.html" %}
 
-{% block title %}
-Dashboard | Property CRM
-{% endblock %}
+{% block title %}Dashboard | Property CRM{% endblock %}
 
-{% block page_heading %}
-Dashboard
-{% endblock %}
+{% block page_heading %}Dashboard{% endblock %}
+
+{% block breadcrumb %} / Overview{% endblock %}
 
 {% block content %}
+<div class="dashboard-shell">
+    <header class="dashboard-hero">
+        <div>
+            <span class="dashboard-kicker">Property operations</span>
+            <h1>Dashboard</h1>
+            <p>Overview of your real estate business.</p>
+        </div>
+        <div class="dashboard-hero-meta"><span class="dashboard-live-dot"></span><span>Portfolio overview</span></div>
+    </header>
 
-<div class="page-header">
+    <section class="dashboard-overview" aria-labelledby="overview-title">
+        <div class="dashboard-section-label"><span class="dashboard-kicker">At a glance</span><h2 id="overview-title">Business Overview</h2></div>
+        <div class="overview-grid">
+            <a class="overview-card overview-card-leads" href="{% url 'lead_list' %}"><div class="overview-card-top"><span class="metric-icon">◎</span><span class="metric-link">View leads <span aria-hidden="true">↗</span></span></div><div class="metric-label">Total Leads</div><strong class="metric-value">{{ lead_stats.total }}</strong><p>All incoming opportunities</p></a>
+            <a class="overview-card" href="{% url 'project_list' %}"><div class="overview-card-top"><span class="metric-icon metric-icon-gold">◇</span><span class="metric-link">View projects <span aria-hidden="true">↗</span></span></div><div class="metric-label">Total Projects</div><strong class="metric-value">{{ total_projects }}</strong><p>Active property portfolio</p></a>
+            <a class="overview-card" href="{% url 'inventory_list' %}"><div class="overview-card-top"><span class="metric-icon metric-icon-slate">□</span><span class="metric-link">View inventory <span aria-hidden="true">↗</span></span></div><div class="metric-label">Total Inventory</div><strong class="metric-value">{{ total_inventory }}</strong><p>Units across all projects</p></a>
+            <a class="overview-card overview-card-available" href="{% url 'inventory_list' %}?status=AVAILABLE"><div class="overview-card-top"><span class="metric-icon metric-icon-green">✓</span><span class="metric-link">Available now <span aria-hidden="true">↗</span></span></div><div class="metric-label">Available Inventory</div><strong class="metric-value">{{ available_inventory }}</strong><p>Ready for allocation</p></a>
+        </div>
+    </section>
 
-    <div>
-        <h1>Dashboard</h1>
-        <p>Overview of your property inventory.</p>
-    </div>
+    <section class="dashboard-feature-grid">
+        <article class="dashboard-feature-card inventory-feature">
+            <div class="feature-heading"><div><span class="dashboard-kicker">Portfolio health</span><h2>Inventory Overview</h2></div><a href="{% url 'inventory_list' %}" class="text-link">View inventory <span aria-hidden="true">↗</span></a></div>
+            <div class="inventory-visual" data-total="{{ total_inventory }}"><div class="inventory-segment-bar" aria-label="Inventory status distribution"><span class="inventory-segment segment-available" data-value="{{ available_inventory }}"></span><span class="inventory-segment segment-blocked" data-value="{{ blocked_inventory }}"></span><span class="inventory-segment segment-booked" data-value="{{ booked_inventory }}"></span><span class="inventory-segment segment-sold" data-value="{{ sold_inventory }}"></span><span class="inventory-segment segment-hold" data-value="{{ on_hold_inventory }}"></span></div><div class="inventory-total"><strong>{{ total_inventory }}</strong><span>Total units</span></div></div>
+            <div class="inventory-legend"><div class="legend-item"><span class="legend-dot dot-available"></span><span>Available</span><strong>{{ available_inventory }}</strong></div><div class="legend-item"><span class="legend-dot dot-blocked"></span><span>Blocked</span><strong>{{ blocked_inventory }}</strong></div><div class="legend-item"><span class="legend-dot dot-booked"></span><span>Booked</span><strong>{{ booked_inventory }}</strong></div><div class="legend-item"><span class="legend-dot dot-sold"></span><span>Sold</span><strong>{{ sold_inventory }}</strong></div><div class="legend-item"><span class="legend-dot dot-hold"></span><span>On Hold</span><strong>{{ on_hold_inventory }}</strong></div></div>
+        </article>
+        <article class="dashboard-feature-card snapshot-feature">
+            <div class="feature-heading"><div><span class="dashboard-kicker">Business snapshot</span><h2>Portfolio at a glance</h2></div></div>
+            <div class="snapshot-list"><a class="snapshot-row" href="{% url 'developer_list' %}"><span class="snapshot-symbol">▥</span><span>Developers</span><strong>{{ total_developers }}</strong><span class="snapshot-arrow">↗</span></a><a class="snapshot-row" href="{% url 'project_list' %}"><span class="snapshot-symbol">◇</span><span>Projects</span><strong>{{ total_projects }}</strong><span class="snapshot-arrow">↗</span></a><a class="snapshot-row" href="{% url 'inventory_list' %}"><span class="snapshot-symbol">□</span><span>Inventory</span><strong>{{ total_inventory }}</strong><span class="snapshot-arrow">↗</span></a><a class="snapshot-row" href="{% url 'lead_list' %}"><span class="snapshot-symbol">◎</span><span>Leads</span><strong>{{ lead_stats.total }}</strong><span class="snapshot-arrow">↗</span></a></div>
+        </article>
+    </section>
 
+    <section class="pipeline-section" aria-labelledby="pipeline-title">
+        <div class="feature-heading pipeline-heading"><div><span class="dashboard-kicker">Conversion journey</span><h2 id="pipeline-title">Lead Pipeline</h2><p>Move every opportunity forward with a clear view of the sales journey.</p></div><a href="{% url 'lead_pipeline' %}" class="btn btn-light">Open pipeline <span aria-hidden="true">↗</span></a></div>
+        <div class="pipeline-layout">
+            <div class="pipeline-track" data-total="{{ lead_stats.total }}"><div class="pipeline-stage stage-new" data-value="{{ lead_stats.new }}"><span class="stage-index">01</span><span class="stage-name">New</span><strong>{{ lead_stats.new }}</strong><span class="stage-caption">Incoming leads</span></div><span class="pipeline-connector" aria-hidden="true">→</span><div class="pipeline-stage stage-contacted" data-value="{{ lead_stats.contacted }}"><span class="stage-index">02</span><span class="stage-name">Contacted</span><strong>{{ lead_stats.contacted }}</strong><span class="stage-caption">First conversation</span></div><span class="pipeline-connector" aria-hidden="true">→</span><div class="pipeline-stage stage-interested" data-value="{{ lead_stats.interested }}"><span class="stage-index">03</span><span class="stage-name">Interested</span><strong>{{ lead_stats.interested }}</strong><span class="stage-caption">Qualified demand</span></div><span class="pipeline-connector" aria-hidden="true">→</span><div class="pipeline-stage stage-visit" data-value="{{ lead_stats.site_visit }}"><span class="stage-index">04</span><span class="stage-name">Site Visit</span><strong>{{ lead_stats.site_visit }}</strong><span class="stage-caption">Property experience</span></div><span class="pipeline-connector" aria-hidden="true">→</span><div class="pipeline-stage stage-negotiation" data-value="{{ lead_stats.negotiation }}"><span class="stage-index">05</span><span class="stage-name">Negotiation</span><strong>{{ lead_stats.negotiation }}</strong><span class="stage-caption">Ready to decide</span></div><span class="pipeline-connector" aria-hidden="true">→</span><div class="pipeline-stage stage-booked" data-value="{{ lead_stats.booked }}"><span class="stage-index">06</span><span class="stage-name">Booked</span><strong>{{ lead_stats.booked }}</strong><span class="stage-caption">Converted</span></div></div>
+            <div class="pipeline-side-stats"><div class="side-stat side-stat-lost"><span class="side-stat-dot"></span><span>Lost</span><strong>{{ lead_stats.lost }}</strong></div><div class="side-stat side-stat-hold"><span class="side-stat-dot"></span><span>On Hold</span><strong>{{ lead_stats.on_hold }}</strong></div></div>
+        </div>
+    </section>
+
+    <section class="dashboard-split-grid">
+        <article class="dashboard-mini-panel"><div class="feature-heading compact-heading"><div><span class="dashboard-kicker">Lead health</span><h2>Lead Status</h2></div><a href="{% url 'lead_list' %}" class="text-link">View all <span aria-hidden="true">↗</span></a></div><div class="bar-list" data-total="{{ lead_stats.total }}"><div class="bar-row"><div><span>New</span><strong>{{ lead_stats.new }}</strong></div><div class="bar-track"><span class="bar-fill fill-blue" data-value="{{ lead_stats.new }}"></span></div></div><div class="bar-row"><div><span>Contacted</span><strong>{{ lead_stats.contacted }}</strong></div><div class="bar-track"><span class="bar-fill fill-sky" data-value="{{ lead_stats.contacted }}"></span></div></div><div class="bar-row"><div><span>Interested</span><strong>{{ lead_stats.interested }}</strong></div><div class="bar-track"><span class="bar-fill fill-green" data-value="{{ lead_stats.interested }}"></span></div></div><div class="bar-row"><div><span>Site Visit</span><strong>{{ lead_stats.site_visit }}</strong></div><div class="bar-track"><span class="bar-fill fill-teal" data-value="{{ lead_stats.site_visit }}"></span></div></div><div class="bar-row"><div><span>Negotiation</span><strong>{{ lead_stats.negotiation }}</strong></div><div class="bar-track"><span class="bar-fill fill-amber" data-value="{{ lead_stats.negotiation }}"></span></div></div><div class="bar-row"><div><span>Booked</span><strong>{{ lead_stats.booked }}</strong></div><div class="bar-track"><span class="bar-fill fill-dark" data-value="{{ lead_stats.booked }}"></span></div></div><div class="bar-row"><div><span>Lost</span><strong>{{ lead_stats.lost }}</strong></div><div class="bar-track"><span class="bar-fill fill-red" data-value="{{ lead_stats.lost }}"></span></div></div><div class="bar-row"><div><span>On Hold</span><strong>{{ lead_stats.on_hold }}</strong></div><div class="bar-track"><span class="bar-fill fill-purple" data-value="{{ lead_stats.on_hold }}"></span></div></div></div></article>
+        <article class="dashboard-mini-panel"><div class="feature-heading compact-heading"><div><span class="dashboard-kicker">Unit availability</span><h2>Inventory Status</h2></div><a href="{% url 'inventory_list' %}" class="text-link">View all <span aria-hidden="true">↗</span></a></div><div class="bar-list" data-total="{{ total_inventory }}"><div class="bar-row"><div><span>Available</span><strong>{{ available_inventory }}</strong></div><div class="bar-track"><span class="bar-fill fill-green" data-value="{{ available_inventory }}"></span></div></div><div class="bar-row"><div><span>Blocked</span><strong>{{ blocked_inventory }}</strong></div><div class="bar-track"><span class="bar-fill fill-amber" data-value="{{ blocked_inventory }}"></span></div></div><div class="bar-row"><div><span>Booked</span><strong>{{ booked_inventory }}</strong></div><div class="bar-track"><span class="bar-fill fill-blue" data-value="{{ booked_inventory }}"></span></div></div><div class="bar-row"><div><span>Sold</span><strong>{{ sold_inventory }}</strong></div><div class="bar-track"><span class="bar-fill fill-dark" data-value="{{ sold_inventory }}"></span></div></div><div class="bar-row"><div><span>On Hold</span><strong>{{ on_hold_inventory }}</strong></div><div class="bar-track"><span class="bar-fill fill-purple" data-value="{{ on_hold_inventory }}"></span></div></div></div></article>
+    </section>
+
+    <section class="quick-actions-panel"><div class="feature-heading compact-heading"><div><span class="dashboard-kicker">Work faster</span><h2>Quick Actions</h2></div></div><div class="quick-action-grid">{% if request.user.role != "VIEWER" %}<a href="{% url 'lead_create' %}" class="quick-action"><span class="quick-action-icon icon-blue">+</span><span><strong>Add Lead</strong><small>Create a new opportunity</small></span><span class="quick-action-arrow">↗</span></a><a href="{% url 'sitevisit_create' %}" class="quick-action"><span class="quick-action-icon icon-gold">◷</span><span><strong>Schedule Site Visit</strong><small>Plan a property experience</small></span><span class="quick-action-arrow">↗</span></a>{% endif %}<a href="{% url 'project_create' %}" class="quick-action"><span class="quick-action-icon icon-purple">◇</span><span><strong>Add Project</strong><small>Expand the portfolio</small></span><span class="quick-action-arrow">↗</span></a><a href="{% url 'inventory_create' %}" class="quick-action"><span class="quick-action-icon icon-green">□</span><span><strong>Add Inventory</strong><small>Add a new unit</small></span><span class="quick-action-arrow">↗</span></a></div></section>
+
+    <section class="dashboard-operations-grid">
+        <article class="dashboard-table-panel"><div class="feature-heading compact-heading"><div><span class="dashboard-kicker">Calendar</span><h2>Today's Site Visits</h2></div><a href="{% url 'sitevisit_list' %}" class="text-link">View all <span aria-hidden="true">↗</span></a></div>{% if todays_site_visits %}<div class="table-responsive"><table class="data-table"><thead><tr><th>Time</th><th>Lead</th><th>Project</th><th>Status</th></tr></thead><tbody>{% for visit in todays_site_visits %}<tr><td>{{ visit.visit_time|time:"h:i A" }}</td><td><strong>{{ visit.lead.name }}</strong></td><td>{{ visit.project.name|default:"—" }}</td><td><span class="status-badge status-{{ visit.status|lower|cut:'_' }}">{{ visit.get_status_display }}</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><p>No site visits scheduled for today.</p></div>{% endif %}</article>
+        <article class="dashboard-table-panel"><div class="feature-heading compact-heading"><div><span class="dashboard-kicker">Follow-up queue</span><h2>Today's Follow-ups</h2></div><a href="{% url 'lead_list' %}" class="text-link">View leads <span aria-hidden="true">↗</span></a></div>{% if todays_followups %}<div class="followup-list">{% for lead in todays_followups %}<a class="followup-row" href="{% url 'lead_detail' lead.pk %}"><span class="followup-time">{{ lead.next_follow_up|date:"h:i A" }}</span><span><strong>{{ lead.name }}</strong><small>{{ lead.interested_project.name|default:"No project selected" }}</small></span><span class="followup-arrow">↗</span></a>{% endfor %}</div>{% else %}<div class="empty-state"><p>No follow-ups scheduled for today.</p></div>{% endif %}</article>
+    </section>
+
+    <section class="dashboard-operations-grid">
+        <article class="dashboard-table-panel"><div class="feature-heading compact-heading"><div><span class="dashboard-kicker">Next on the calendar</span><h2>Upcoming Site Visits</h2></div><a href="{% url 'sitevisit_list' %}" class="text-link">View all <span aria-hidden="true">↗</span></a></div>{% if upcoming_site_visits %}<div class="table-responsive"><table class="data-table"><thead><tr><th>Date</th><th>Time</th><th>Lead</th><th>Project</th><th>Status</th></tr></thead><tbody>{% for visit in upcoming_site_visits %}<tr><td>{{ visit.visit_date|date:"d M Y" }}</td><td>{{ visit.visit_time|time:"h:i A" }}</td><td><strong>{{ visit.lead.name }}</strong></td><td>{{ visit.project.name|default:"—" }}</td><td><span class="status-badge status-{{ visit.status|lower|cut:'_' }}">{{ visit.get_status_display }}</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><p>No upcoming site visits.</p></div>{% endif %}</article>
+        <article class="dashboard-table-panel"><div class="feature-heading compact-heading"><div><span class="dashboard-kicker">Team pulse</span><h2>Sales Team</h2></div><a href="{% url 'user_list' %}" class="text-link">View team <span aria-hidden="true">↗</span></a></div>{% if sales_team_stats %}<div class="team-pulse-list">{% for sales in sales_team_stats %}<div class="team-pulse-row"><span class="team-avatar">{{ sales.user.first_name|default:sales.user.username|slice:":1"|upper }}</span><span><strong>{{ sales.user.get_full_name|default:sales.user.username }}</strong><small>{{ sales.total_leads }} leads · {{ sales.upcoming_site_visits }} upcoming visits</small></span><strong class="team-pulse-booked">{{ sales.booked_leads }} booked</strong></div>{% endfor %}</div>{% else %}<div class="empty-state"><p>No active sales users found.</p></div>{% endif %}</article>
+    </section>
 </div>
-
-
-<!-- MAIN STATISTICS -->
-
-<div class="dashboard-stats">
-
-    <div class="stat-card">
-        <div class="stat-icon">🏢</div>
-
-        <div>
-            <span>Total Developers</span>
-            <strong>{{ total_developers }}</strong>
-        </div>
-    </div>
-
-
-    <div class="stat-card">
-        <div class="stat-icon">🏗️</div>
-
-        <div>
-            <span>Total Projects</span>
-            <strong>{{ total_projects }}</strong>
-        </div>
-    </div>
-
-
-    <div class="stat-card">
-        <div class="stat-icon">🏠</div>
-
-        <div>
-            <span>Total Inventory</span>
-            <strong>{{ total_inventory }}</strong>
-        </div>
-    </div>
-
-
-    <div class="stat-card">
-        <div class="stat-icon">✅</div>
-
-        <div>
-            <span>Available</span>
-            <strong>{{ available_inventory }}</strong>
-        </div>
-    </div>
-
-</div>
-
-
-<!-- INVENTORY STATUS -->
-
-<div class="section-title">
-    <h2>Inventory Status</h2>
-</div>
-
-
-<div class="dashboard-stats">
-
-    <div class="stat-card">
-        <div class="stat-icon">🟢</div>
-
-        <div>
-            <span>Available</span>
-            <strong>{{ available_inventory }}</strong>
-        </div>
-    </div>
-
-
-    <div class="stat-card">
-        <div class="stat-icon">🟡</div>
-
-        <div>
-            <span>Blocked</span>
-            <strong>{{ blocked_inventory }}</strong>
-        </div>
-    </div>
-
-
-    <div class="stat-card">
-        <div class="stat-icon">🔵</div>
-
-        <div>
-            <span>Booked</span>
-            <strong>{{ booked_inventory }}</strong>
-        </div>
-    </div>
-
-
-    <div class="stat-card">
-        <div class="stat-icon">🔴</div>
-
-        <div>
-            <span>Sold</span>
-            <strong>{{ sold_inventory }}</strong>
-        </div>
-    </div>
-
-
-    <div class="stat-card">
-        <div class="stat-icon">🟠</div>
-
-        <div>
-            <span>On Hold</span>
-            <strong>{{ on_hold_inventory }}</strong>
-        </div>
-    </div>
-
-
-    <div class="stat-card">
-        <div class="stat-icon">⚪</div>
-
-        <div>
-            <span>Not Available</span>
-            <strong>{{ not_available_inventory }}</strong>
-        </div>
-    </div>
-
-</div>
-
-
-<!-- QUICK ACTIONS -->
-
-<div class="section-title">
-    <h2>Quick Actions</h2>
-</div>
-
-
-<div class="quick-actions">
-
-    <a
-        href="{% url 'developer_list' %}"
-        class="quick-card">
-
-        <span>🏢</span>
-
-        <div>
-            <strong>Developers</strong>
-            <small>Manage developers</small>
-        </div>
-
-    </a>
-
-
-    <a
-        href="{% url 'location_list' %}"
-        class="quick-card">
-
-        <span>📍</span>
-
-        <div>
-            <strong>Locations</strong>
-            <small>Manage locations</small>
-        </div>
-
-    </a>
-
-
-    <a
-        href="{% url 'project_list' %}"
-        class="quick-card">
-
-        <span>🏗️</span>
-
-        <div>
-            <strong>Projects</strong>
-            <small>Manage projects</small>
-        </div>
-
-    </a>
-
-
-    <a
-        href="{% url 'inventory_list' %}"
-        class="quick-card">
-
-        <span>🏠</span>
-
-        <div>
-            <strong>Inventory</strong>
-            <small>Manage inventory</small>
-        </div>
-
-    </a>
-
-</div>
-<!-- LEAD STATUS -->
-
-<div class="section-title">
-    <h2>Lead Status</h2>
-</div>
-
-<div class="dashboard-stats">
-
-    <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div>
-            <span>Total Leads</span>
-            <strong>{{ lead_stats.total }}</strong>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">🆕</div>
-        <div>
-            <span>New</span>
-            <strong>{{ lead_stats.new }}</strong>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">📞</div>
-        <div>
-            <span>Contacted</span>
-            <strong>{{ lead_stats.contacted }}</strong>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">❤️</div>
-        <div>
-            <span>Interested</span>
-            <strong>{{ lead_stats.interested }}</strong>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">📍</div>
-        <div>
-            <span>Site Visits</span>
-            <strong>{{ lead_stats.site_visit }}</strong>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">🤝</div>
-        <div>
-            <span>Negotiation</span>
-            <strong>{{ lead_stats.negotiation }}</strong>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">🎉</div>
-        <div>
-            <span>Booked</span>
-            <strong>{{ lead_stats.booked }}</strong>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">⏸️</div>
-        <div>
-            <span>On Hold</span>
-            <strong>{{ lead_stats.on_hold }}</strong>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">❌</div>
-        <div>
-            <span>Lost</span>
-            <strong>{{ lead_stats.lost }}</strong>
-        </div>
-    </div>
-
-</div>
-
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll("[data-total]").forEach((group) => {
+        const total = Number(group.dataset.total) || 0;
+        group.querySelectorAll("[data-value]").forEach((item) => {
+            const value = Number(item.dataset.value) || 0;
+            const width = total > 0 ? Math.min((value / total) * 100, 100) : 0;
+            item.style.setProperty("--bar-width", `${width}%`);
+        });
+    });
+</script>
 {% endblock %}

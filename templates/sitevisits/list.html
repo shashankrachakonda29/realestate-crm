@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}
+Site Visits | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Site Visits
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Site Visits</h1>
+        <p>Manage scheduled and completed property site visits.</p>
+    </div>
+
+    {% if request.user.role != "VIEWER" %}
+        <a href="{% url 'sitevisit_create' %}" class="btn btn-primary">
+            <span aria-hidden="true">+</span> Schedule Site Visit
+        </a>
+    {% endif %}
+
+</div>
+
+
+<div class="card">
+
+    {% if site_visits %}
+
+    <div class="table-responsive">
+
+        <table class="data-table">
+
+            <thead>
+                <tr>
+                    <th>Lead</th>
+                    <th>Project</th>
+                    <th>Assigned To</th>
+                    <th>Visit Date</th>
+                    <th>Visit Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for visit in site_visits %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ visit.lead.name }}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            {{ visit.lead.phone }}
+                        </small>
+                    </td>
+
+
+                    <td>
+                        {{ visit.project.name }}
+                    </td>
+
+
+                    <td>
+
+                        {% if visit.assigned_to %}
+                            {{ visit.assigned_to }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {{ visit.visit_date|date:"d M Y" }}
+                    </td>
+
+
+                    <td>
+                        {{ visit.visit_time|time:"h:i A" }}
+                    </td>
+
+
+                    <td>
+                        <span class="status-badge status-{{ visit.status|lower|cut:'_' }}">
+                            {{ visit.get_status_display }}
+                        </span>
+                    </td>
+
+
+                    <td>
+
+                        <a
+                            href="{% url 'sitevisit_detail' visit.pk %}"
+                            class="btn btn-light"
+                        >
+                            View
+                        </a>
+
+                        {% if request.user.role != "VIEWER" %}
+                            <a
+                                href="{% url 'sitevisit_edit' visit.pk %}"
+                                class="btn btn-light"
+                            >
+                                Edit
+                            </a>
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <h3>No site visits found</h3>
+
+        <p>
+            Schedule your first site visit for a lead.
+        </p>
+
+        <a
+            href="{% url 'sitevisit_create' %}"
+            class="btn btn-primary"
+        >
+            + Schedule Site Visit
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

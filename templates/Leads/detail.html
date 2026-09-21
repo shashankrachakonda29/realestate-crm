@@ -14,7 +14,11 @@ Lead Details
 
     <div>
         <h1>{{ lead.name }}</h1>
-        <p>Lead details and customer requirements.</p>
+        <p>Lead details, requirements, activity, and visit history.</p>
+        <div class="contact-actions">
+            <a class="btn btn-light" href="tel:{{ lead.phone }}">Call {{ lead.phone }}</a>
+            <a class="btn btn-light" href="https://wa.me/{{ lead.phone }}" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
     </div>
 
     <div class="form-actions">
@@ -53,7 +57,7 @@ Lead Details
 
         <div class="detail-item">
             <span>Phone</span>
-            <strong>{{ lead.phone }}</strong>
+            <strong><a href="tel:{{ lead.phone }}">{{ lead.phone }}</a></strong>
         </div>
 
         <div class="detail-item">
@@ -63,7 +67,7 @@ Lead Details
 
         <div class="detail-item">
             <span>Source</span>
-            <strong>{{ lead.get_source_display }}</strong>
+            <strong><span class="source-badge">{{ lead.get_source_display }}</span></strong>
         </div>
 
 
@@ -103,9 +107,7 @@ Lead Details
 
             {% else %}
 
-            <strong>
-                {{ lead.get_status_display }}
-            </strong>
+            <strong><span class="status-badge lead-status-{{ lead.status|lower|cut:'_' }}">{{ lead.get_status_display }}</span></strong>
 
             {% endif %}
 
@@ -480,6 +482,127 @@ Lead Details
 
     </form>
     
+</div>
+<div class="section-title">
+    <h2>Site Visits</h2>
+</div>
+
+<div class="card">
+
+    <div class="page-header">
+
+        <div>
+            <p>
+                Scheduled and completed visits for this lead.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'sitevisit_create' %}?lead={{ lead.pk }}"
+            class="btn btn-primary"
+        >
+            + Schedule Site Visit
+        </a>
+
+    </div>
+
+
+    {% if site_visits %}
+
+        <div class="table-responsive">
+
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for visit in site_visits %}
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                {{ visit.project.name }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ visit.visit_date|date:"d M Y" }}
+                        </td>
+
+                        <td>
+                            {{ visit.visit_time|time:"h:i A" }}
+                        </td>
+
+                        <td>
+                            {% if visit.assigned_to %}
+                                {{ visit.assigned_to }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ visit.get_status_display }}
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'sitevisit_detail' visit.pk %}"
+                                class="btn btn-light"
+                            >
+                                View
+                            </a>
+
+                            <a
+                                href="{% url 'sitevisit_edit' visit.pk %}"
+                                class="btn btn-light"
+                            >
+                                Edit
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <p>
+                No site visits scheduled for this lead.
+            </p>
+
+            <a
+                href="{% url 'sitevisit_create' %}?lead={{ lead.pk }}"
+                class="btn btn-primary"
+            >
+                + Schedule Site Visit
+            </a>
+
+        </div>
+
+    {% endif %}
+
 </div>
 {% endif %}
 {% endblock %}

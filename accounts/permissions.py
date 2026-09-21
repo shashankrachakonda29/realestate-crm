@@ -1,45 +1,20 @@
-from rest_framework.permissions import BasePermission
+from django.core.exceptions import PermissionDenied
 
 
-class CRMRolePermission(BasePermission):
+def require_roles(*allowed_roles):
 
-    def has_permission(self, request, view):
+    def decorator(view_func):
 
-        if not request.user.is_authenticated:
-            return False
+        def wrapper(request, *args, **kwargs):
 
-        role = request.user.role
+            if not request.user.is_authenticated:
+                raise PermissionDenied
 
-        # Everyone authenticated can read
-        if request.method in ["GET", "HEAD", "OPTIONS"]:
-            return role in [
-                "ADMIN",
-                "MANAGER",
-                "SALES",
-                "VIEWER",
-            ]
+            if request.user.role not in allowed_roles:
+                raise PermissionDenied
 
-        # Viewer cannot create/update/delete
-        if role == "VIEWER":
-            return False
+            return view_func(request, *args, **kwargs)
 
-        # Sales cannot delete
-        if role == "SALES" and request.method == "DELETE":
-            return False
+        return wrapper
 
-        # Admin, Manager and Sales can create/update
-        if role in [
-            "ADMIN",
-            "MANAGER",
-            "SALES",
-        ]:
-            return True
-
-        # Only Admin and Manager can delete
-        if role in [
-            "ADMIN",
-            "MANAGER",
-        ] and request.method == "DELETE":
-            return True
-
-        return False
+    return decorator

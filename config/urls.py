@@ -65,4 +65,8 @@ urlpatterns = [
         include("leads.urls")
     ),
     path("accounts/", include("accounts.urls")),
+    path(
+    "site-visits/",
+    include("sitevisits.urls"),
+),
 ]

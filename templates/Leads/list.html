@@ -14,12 +14,12 @@ Leads
 
     <div>
         <h1>Leads</h1>
-        <p>Manage your property leads.</p>
+        <p>Track prospects, follow-ups, and conversion momentum.</p>
     </div>
 
     {% if request.user.role != "VIEWER" %}
         <a href="{% url 'lead_create' %}" class="btn btn-primary">
-            + Add Lead
+            <span aria-hidden="true">+</span> Add Lead
         </a>
     {% endif %}
 
@@ -33,8 +33,6 @@ Leads
     <form method="get">
 
         <div class="form-grid">
-
-            <!-- SEARCH -->
 
             <div class="form-group">
 
@@ -53,8 +51,6 @@ Leads
             </div>
 
 
-            <!-- STATUS -->
-
             <div class="form-group">
 
                 <label for="status">
@@ -71,9 +67,7 @@ Leads
 
                         <option
                             value="{{ value }}"
-                            {% if selected_status == value %}
-                                selected
-                            {% endif %}
+                            {% if selected_status == value %}selected{% endif %}
                         >
                             {{ label }}
                         </option>
@@ -84,8 +78,18 @@ Leads
 
             </div>
 
+            <div class="form-group">
+                <label for="assigned_to">Assigned salesperson</label>
+                <select id="assigned_to" name="assigned_to">
+                    <option value="">All salespeople</option>
+                    {% for user in users %}
+                        <option value="{{ user.pk }}" {% if selected_assigned_to == user.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ user.get_full_name|default:user.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <!-- SOURCE -->
 
             <div class="form-group">
 
@@ -103,9 +107,7 @@ Leads
 
                         <option
                             value="{{ value }}"
-                            {% if selected_source == value %}
-                                selected
-                            {% endif %}
+                            {% if selected_source == value %}selected{% endif %}
                         >
                             {{ label }}
                         </option>
@@ -116,8 +118,6 @@ Leads
 
             </div>
 
-
-            <!-- PROPERTY TYPE -->
 
             <div class="form-group">
 
@@ -138,9 +138,7 @@ Leads
 
                         <option
                             value="{{ property_type }}"
-                            {% if selected_property_type == property_type %}
-                                selected
-                            {% endif %}
+                            {% if selected_property_type == property_type %}selected{% endif %}
                         >
                             {{ property_type }}
                         </option>
@@ -160,7 +158,7 @@ Leads
                 type="submit"
                 class="btn btn-primary"
             >
-                Search / Filter
+                Apply filters
             </button>
 
             <a
@@ -208,7 +206,7 @@ Leads
 
                     <tr>
 
-                        <th>Name</th>
+                        <th>Lead</th>
                         <th>Phone</th>
                         <th>Source</th>
                         <th>Status</th>
@@ -216,7 +214,7 @@ Leads
                         <th>Location</th>
                         <th>Budget</th>
                         <th>Assigned To</th>
-                        <th>Follow Up</th>
+                        <th>Next Follow-up</th>
                         <th>Actions</th>
 
                     </tr>
@@ -230,9 +228,7 @@ Leads
 
                         <tr>
 
-                            <!-- NAME -->
-
-                            <td>
+                            <td class="lead-primary-cell">
 
                                 <strong>
                                     {{ lead.name }}
@@ -241,28 +237,22 @@ Leads
                             </td>
 
 
-                            <!-- PHONE -->
-
                             <td>
                                 {{ lead.phone }}
                             </td>
 
 
-                            <!-- SOURCE -->
-
                             <td>
-                                {{ lead.get_source_display }}
+                                <span class="source-badge">{{ lead.get_source_display }}</span>
                             </td>
 
 
-                            <!-- STATUS -->
-
                             <td>
-                                {{ lead.get_status_display }}
+                                <span class="status-badge lead-status-{{ lead.status|lower|cut:'_' }}">
+                                    {{ lead.get_status_display }}
+                                </span>
                             </td>
 
-
-                            <!-- PROJECT -->
 
                             <td>
 
@@ -279,14 +269,10 @@ Leads
                             </td>
 
 
-                            <!-- LOCATION -->
-
                             <td>
                                 {{ lead.preferred_location|default:"—" }}
                             </td>
 
-
-                            <!-- BUDGET -->
 
                             <td>
 
@@ -313,8 +299,6 @@ Leads
                             </td>
 
 
-                            <!-- ASSIGNED TO -->
-
                             <td>
 
                                 {% if lead.assigned_to %}
@@ -329,8 +313,6 @@ Leads
 
                             </td>
 
-
-                            <!-- FOLLOW UP -->
 
                             <td>
 
@@ -370,6 +352,18 @@ Leads
 
                                 {% endif %}
 
+
+                                {% if request.user.role == "ADMIN" or request.user.role == "MANAGER" %}
+
+                                    <a
+                                        href="{% url 'lead_delete' lead.pk %}"
+                                        class="btn btn-light"
+                                    >
+                                        Delete
+                                    </a>
+
+                                {% endif %}
+
                             </td>
 
                         </tr>
@@ -382,7 +376,6 @@ Leads
 
         </div>
 
-
     {% else %}
 
         <div class="empty-state">
@@ -392,6 +385,7 @@ Leads
             <p>
                 Try changing your search or filters.
             </p>
+
 
             {% if request.user.role != "VIEWER" %}
 
