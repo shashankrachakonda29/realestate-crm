@@ -85,25 +85,6 @@
             </div>
 
 
-            <!-- UNIT NUMBER -->
-
-            <div class="form-group">
-
-                <label>
-                    Unit Number *
-                </label>
-
-                <input
-                    type="text"
-                    name="unit_number"
-                    required
-                    value="{{ inventory_item.unit_number|default:'' }}"
-                    placeholder="Example: Villa 101"
-                >
-
-            </div>
-
-
             <!-- PROPERTY TYPE -->
 
             <div class="form-group">
@@ -454,7 +435,30 @@
 
             </div>
 
+            <!-- Extra Built-up SALE PRICE -->
 
+            <div class="form-group">
+                <label>Basic Sale Price 2</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    name="basic_sale_price_2"
+                    value="{{ inventory_item.basic_sale_price_2|default:'' }}"
+                    readonly
+                >
+            </div>
+
+            <!-- Extra Built-up Price / SFT -->
+
+            <div class="form-group">
+                <label>Extra Built-up Rate / SFT</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    name="extra_built_up_rate_per_sq_ft"
+                    value="{{ inventory_item.extra_built_up_rate_per_sq_ft|default:'' }}"
+                >
+            </div>
             <!-- GST -->
 
             <div class="form-group">
@@ -1004,248 +1008,116 @@
 <!-- ================================================= -->
 
 <script>
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-
-        const basicSalePrice =
-            document.querySelector(
-                '[name="basic_sale_price"]'
-            );
-
-
-        const gstAmount =
-            document.querySelector(
-                '[name="gst_amount"]'
-            );
-
-
-        const amenitiesCharges =
-            document.querySelector(
-                '[name="amenities_charges"]'
-            );
-
-
-        const facingCharges =
-            document.querySelector(
-                '[name="facing_charges"]'
-            );
-
-
-        const discount =
-            document.querySelector(
-                '[name="discount"]'
-            );
-
-
-        const unitSize =
-            document.querySelector(
-                '[name="unit_size_sq_ft"]'
-            );
-
-
-        const totalUnitCost =
-            document.getElementById(
-                "total_unit_cost"
-            );
-
-
-        const pricePerSqFt =
-            document.getElementById(
-                "price_per_sq_ft_incl_gst"
-            );
-
-
-        function numberValue(element) {
-
-            if (!element) {
-                return 0;
-            }
-
-            return Number(element.value) || 0;
-
-        }
-
-
-        function calculatePrice() {
-
-
-            const basic =
-                numberValue(
-                    basicSalePrice
-                );
-
-
-            const gst =
-                numberValue(
-                    gstAmount
-                );
-
-
-            const amenities =
-                numberValue(
-                    amenitiesCharges
-                );
-
-
-            const facing =
-                numberValue(
-                    facingCharges
-                );
-
-
-            const discountValue =
-                numberValue(
-                    discount
-                );
-
-
-            const size =
-                numberValue(
-                    unitSize
-                );
-
-
-            /*
-             * Total Unit Cost
-             *
-             * Basic Sale Price
-             * + GST
-             * + Amenities
-             * + Facing Charges
-             * - Discount
-             */
-
-            const total =
-                basic
-                + gst
-                + amenities
-                + facing
-                - discountValue;
-
-
-            if (totalUnitCost) {
-
-                totalUnitCost.value =
-                    total.toFixed(2);
-
-            }
-
-
-            /*
-             * Price / SFT
-             */
-
-            if (pricePerSqFt) {
-
-                if (size > 0) {
-
-                    pricePerSqFt.value =
-                        (
-                            total / size
-                        ).toFixed(2);
-
-                } else {
-
-                    pricePerSqFt.value = "";
-
-                }
-
-            }
-
-
-            console.log(
-                "Basic:",
-                basic
-            );
-
-
-            console.log(
-                "GST:",
-                gst
-            );
-
-
-            console.log(
-                "Amenities:",
-                amenities
-            );
-
-
-            console.log(
-                "Facing:",
-                facing
-            );
-
-
-            console.log(
-                "Discount:",
-                discountValue
-            );
-
-
-            console.log(
-                "Unit Size:",
-                size
-            );
-
-
-            console.log(
-                "TOTAL:",
-                total
-            );
-
-
-        }
-
-
-        const calculationFields = [
-
-            basicSalePrice,
-
-            gstAmount,
-
-            amenitiesCharges,
-
-            facingCharges,
-
-            discount,
-
-            unitSize
-
-        ];
-
-
-        calculationFields.forEach(
-            function (field) {
-
-                if (field) {
-
-                    field.addEventListener(
-                        "input",
-                        calculatePrice
-                    );
-
-
-                    field.addEventListener(
-                        "change",
-                        calculatePrice
-                    );
-
-                }
-
-            }
-        );
-
-
-        calculatePrice();
-
-
+document.addEventListener("DOMContentLoaded", function () {
+
+    const get = (name) =>
+        document.querySelector(`[name="${name}"]`);
+
+    const sqYards = get("plot_size_sq_yards");
+    const sqFeet = get("plot_size_sq_ft");
+    const builduparea = get("built_up_area_sq_ft");
+    const extrabuilduparea = get("extra_built_up_area_sq_ft");
+    
+
+
+    const basic = get("basic_sale_price");
+    const basebysft = get("basic_sale_price_per_sq_ft");
+    const extraArea = get("extra_built_up_area_sq_ft");
+    const extraRate = get("extra_built_up_rate_per_sq_ft");
+    const basic2 = get("basic_sale_price_2");
+    const gst = get("gst_amount");
+    const amenities = get("amenities_charges");
+    const facing = get("facing_charges");
+    const discount = get("discount");
+    const unitSize = get("unit_size_sq_ft");
+
+    const totalCost = document.getElementById("total_unit_cost");
+    const pricePerSqFt = document.getElementById("price_per_sq_ft_incl_gst");
+
+
+    function value(element) {
+        return Number(element?.value) || 0;
     }
-);
 
+    const unitsizesft=value(builduparea)+value(extrabuilduparea);
+    unitSize.value=unitsizesft;
+    // Sq.Yds → Sq.Ft
+    function calculatePlotSize() {
+        const yards = value(sqYards);
+
+        sqFeet.value = yards
+            ? (yards * 9).toFixed(2)
+            : "";
+    }
+
+
+    // Price calculations
+    function calculatePrice() {
+
+        const extraBasic =
+            value(extraArea) * value(extraRate);
+
+        if (basic2) {
+            basic2.value = extraBasic.toFixed(2);
+        }
+
+        const total =
+            value(basic) +
+            extraBasic +
+            value(gst) +
+            value(amenities) +
+            value(facing) -
+            value(discount);
+
+        if (totalCost) {
+            totalCost.value = total.toFixed(2);
+        }
+
+        if (pricePerSqFt) {
+            pricePerSqFt.value =
+                value(unitSize) > 0
+                    ? (total / value(unitSize)).toFixed(2)
+                    : "";
+        }
+
+        // Basic Sale Price empty or zero
+        if (!basic?.value.trim() || value(basic) === 0) {
+
+            const basic_price=value(builduparea) * value(basebysft);
+
+            basic.value = basic_price.toFixed(2);
+        }
+    }
+
+
+    // Plot size calculation
+    if (sqYards && sqFeet) {
+        sqYards.addEventListener("input", calculatePlotSize);
+        calculatePlotSize();
+    }
+
+
+    // Price calculation fields
+    [
+        basic,
+        extraArea,
+        extraRate,
+        gst,
+        amenities,
+        facing,
+        discount,
+        unitSize
+    ].forEach(field => {
+        if (field) {
+            field.addEventListener("input", calculatePrice);
+            field.addEventListener("change", calculatePrice);
+        }
+    });
+
+
+    calculatePrice();
+
+});
 </script>
 
 

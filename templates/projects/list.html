@@ -106,19 +106,9 @@ Projects
 
                     <td>
 
-                        {% if project.is_active %}
-
-                        <span class="badge badge-active">
-                            Active
+                        <span class="badge badge-project-status status-{{ project.project_status|lower }}">
+                            {{ project.get_project_status_display }}
                         </span>
-
-                        {% else %}
-
-                        <span class="badge badge-inactive">
-                            Inactive
-                        </span>
-
-                        {% endif %}
 
                     </td>
 

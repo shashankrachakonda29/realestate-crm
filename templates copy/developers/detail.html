@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ developer.name }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Developer Details
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>{{ developer.name }}</h1>
+        <p>Developer information and details.</p>
+    </div>
+
+    <div class="actions">
+
+        <a
+            href="{% url 'developer_edit' developer.pk %}"
+            class="btn btn-primary">
+            Edit
+        </a>
+
+        <a
+            href="{% url 'developer_list' %}"
+            class="btn btn-light">
+            Back
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="card detail-card">
+
+    <div class="detail-grid">
+
+        <div>
+            <span class="detail-label">
+                Developer
+            </span>
+
+            <strong>
+                {{ developer.name }}
+            </strong>
+        </div>
+
+
+        <div>
+            <span class="detail-label">
+                Status
+            </span>
+
+            {% if developer.is_active %}
+                <span class="badge badge-active">
+                    Active
+                </span>
+            {% else %}
+                <span class="badge badge-inactive">
+                    Inactive
+                </span>
+            {% endif %}
+        </div>
+
+
+        <div>
+            <span class="detail-label">
+                Contact Person
+            </span>
+
+            {{ developer.contact_person|default:"—" }}
+        </div>
+
+
+        <div>
+            <span class="detail-label">
+                Phone
+            </span>
+
+            {{ developer.phone|default:"—" }}
+        </div>
+
+
+        <div>
+            <span class="detail-label">
+                Email
+            </span>
+
+            {{ developer.email|default:"—" }}
+        </div>
+
+
+        <div>
+            <span class="detail-label">
+                Website
+            </span>
+
+            {% if developer.website %}
+
+                <a
+                    href="{{ developer.website }}"
+                    target="_blank">
+                    {{ developer.website }}
+                </a>
+
+            {% else %}
+                —
+            {% endif %}
+
+        </div>
+
+
+        <div class="full-width">
+
+            <span class="detail-label">
+                Address
+            </span>
+
+            {{ developer.address|default:"—" }}
+
+        </div>
+
+
+        <div class="full-width">
+
+            <span class="detail-label">
+                Description
+            </span>
+
+            {{ developer.description|default:"—" }}
+
+        </div>
+
+    </div>
+
+
+    {% if delete_blocked %}
+
+        <div class="delete-box delete-blocked-box">
+
+            <span class="eyebrow">Deletion unavailable</span>
+
+            <h2>Cannot delete this developer</h2>
+
+            <p>
+                This developer is currently linked to existing projects.
+                Remove or reassign the developer from these projects before
+                deleting the developer.
+            </p>
+
+            {% if related_projects %}
+                <strong>Linked projects</strong>
+
+                <ul class="related-project-list">
+                    {% for project in related_projects %}
+                        <li>
+                            <a href="{% url 'project_detail' project.pk %}">
+                                {{ project.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <div class="form-actions">
+                <a
+                    href="{% url 'developer_detail' developer.pk %}"
+                    class="btn btn-light">
+                    Back to Developer
+                </a>
+
+                <a
+                    href="{% url 'developer_list' %}"
+                    class="btn btn-primary">
+                    Back to Developers
+                </a>
+            </div>
+
+        </div>
+
+    {% elif confirm_delete %}
+
+        <div class="delete-box">
+
+            <strong>
+                Are you sure you want to delete this developer?
+            </strong>
+
+            <form
+                method="post"
+                action="{% url 'developer_delete' developer.pk %}">
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-danger">
+                    Yes, Delete
+                </button>
+
+                <a
+                    href="{% url 'developer_detail' developer.pk %}"
+                    class="btn btn-light">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    {% else %}
+
+        <div class="detail-footer">
+
+            <a
+                href="{% url 'developer_delete' developer.pk %}"
+                class="btn btn-danger">
+                Delete Developer
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

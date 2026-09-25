@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}
+Projects | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Projects
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Projects</h1>
+        <p>Manage all property projects.</p>
+    </div>
+
+    <a
+        href="{% url 'project_create' %}"
+        class="btn btn-primary">
+        + Add Project
+    </a>
+
+</div>
+
+
+<div class="card">
+
+    <form
+        method="get"
+        class="search-bar">
+
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="Search projects..."
+        >
+
+        <button
+            type="submit"
+            class="btn btn-secondary">
+            Search
+        </button>
+
+        {% if search %}
+
+        <a
+            href="{% url 'project_list' %}"
+            class="btn btn-light">
+            Clear
+        </a>
+
+        {% endif %}
+
+    </form>
+
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Project</th>
+                    <th>Developer</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Units</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for project in projects %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ project.name }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        {{ project.developer.name }}
+                    </td>
+
+                    <td>
+                        {{ project.location.name }}
+                    </td>
+
+                    <td>
+                        {{ project.get_project_type_display }}
+                    </td>
+
+                    <td>
+                        {{ project.total_units|default:"—" }}
+                    </td>
+
+                    <td>
+
+                        {% if project.is_active %}
+
+                        <span class="badge badge-active">
+                            Active
+                        </span>
+
+                        {% else %}
+
+                        <span class="badge badge-inactive">
+                            Inactive
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <div class="actions">
+
+                            <a
+                                href="{% url 'project_detail' project.pk %}"
+                                class="btn btn-light">
+                                View
+                            </a>
+
+                            <a
+                                href="{% url 'project_edit' project.pk %}"
+                                class="btn btn-light">
+                                Edit
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        class="empty-state">
+
+                        No projects found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

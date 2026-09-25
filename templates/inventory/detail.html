@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-{{ inventory_item.unit_number }} | Property CRM
+{{ inventory_item.project.name }} | Property CRM
 {% endblock %}
 
 {% block page_heading %}
@@ -13,7 +13,7 @@ Inventory Details
 <div class="page-header">
 
     <div>
-        <h1>{{ inventory_item.unit_number }}</h1>
+        <h1>{{ inventory_item.project.name }}</h1>
         <p>
             {{ inventory_item.project.name }}
         </p>
@@ -46,7 +46,7 @@ Inventory Details
 
     <p>
         Are you sure you want to delete
-        <strong>{{ inventory_item.unit_number }}</strong>?
+        <strong>{{ inventory_item.project.name }}</strong>?
     </p>
 
     <form method="post">
@@ -148,35 +148,37 @@ Inventory Details
 
         <div>
             <span>Plot Size (Sq. Ft)</span>
-            <strong>
+            <strong class="comma-format">
                 {{ inventory_item.plot_size_sq_ft|default:"—" }}
             </strong>
         </div>
 
         <div>
             <span>Saleable Area</span>
-            <strong>
+            <strong class="comma-format">
                 {{ inventory_item.saleable_area_sq_ft|default:"—" }} SFT
             </strong>
         </div>
 
         <div>
             <span>Built-up Area</span>
-            <strong>
+            <strong class="comma-format">
                 {{ inventory_item.built_up_area_sq_ft|default:"—" }} SFT
             </strong>
         </div>
 
         <div>
             <span>Extra Built-up Area</span>
-            <strong>
+            <strong class="comma-format">
                 {{ inventory_item.extra_built_up_area_sq_ft|default:"—" }} SFT
             </strong>
         </div>
 
+        
+
         <div>
             <span>Unit Size</span>
-            <strong>
+            <strong class="comma-format">
                 {{ inventory_item.unit_size_sq_ft|default:"—" }} SFT
             </strong>
         </div>
@@ -219,42 +221,53 @@ Inventory Details
 
         <div>
             <span>Current Price</span>
-            <strong>
+            <strong class="comma-format">
                 ₹{{ inventory_item.current_price|default:"—" }}
             </strong>
         </div>
 
         <div>
             <span>Basic Sale Price</span>
-            <strong>
+            <strong class="comma-format">
                 ₹{{ inventory_item.basic_sale_price|default:"—" }}
             </strong>
         </div>
-
         <div>
             <span>Basic Sale Price / SFT</span>
-            <strong>
+            <strong class="comma-format">
                 ₹{{ inventory_item.basic_sale_price_per_sq_ft|default:"—" }}
             </strong>
         </div>
-
+        <div>
+            <span>Extra Built-up Area Sale Price</span>
+            <strong class="comma-format">
+                ₹{{ inventory_item.basic_sale_price_2|default:"0" }}
+            </strong>
+        </div>
+        
+        <div>
+            <span>Extra Built-up Rate / SFT</span>
+            <strong class="comma-format">
+                ₹{{ inventory_item.extra_built_up_rate_per_sq_ft|default:"0" }}
+            </strong>
+        </div>
         <div>
             <span>GST Amount</span>
-            <strong>
+            <strong class="comma-format">
                 ₹{{ inventory_item.gst_amount|default:"—" }}
             </strong>
         </div>
 
         <div>
             <span>Amenities Charges</span>
-            <strong>
+            <strong class="comma-format">
                 ₹{{ inventory_item.amenities_charges|default:"—" }}
             </strong>
         </div>
 
         <div>
             <span>Facing Charges</span>
-            <strong>
+            <strong class="comma-format">
                 ₹{{ inventory_item.facing_charges|default:"—" }}
             </strong>
         </div>
@@ -268,21 +281,21 @@ Inventory Details
 
         <div>
             <span>Booking Amount</span>
-            <strong>
+            <strong class="comma-format">
                 ₹{{ inventory_item.booking_amount|default:"—" }}
             </strong>
         </div>
 
         <div>
             <span>Price / SFT Incl. GST</span>
-            <strong>
+            <strong class="comma-format">
                 ₹{{ inventory_item.price_per_sq_ft_incl_gst|default:"—" }}
             </strong>
         </div>
 
         <div>
             <span>Total Unit Cost</span>
-            <strong>
+            <strong class="comma-format">
                 ₹{{ inventory_item.total_unit_cost|default:"—" }}
             </strong>
         </div>
@@ -497,5 +510,8 @@ Inventory Details
 
 
 {% endif %}
+{% load static %}
+
+<script src="{% static 'js/number_format.js' %}"></script>
 
 {% endblock %}

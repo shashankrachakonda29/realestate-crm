@@ -2,6 +2,7 @@ from django.db import models
 
 from developers.models import Developer
 from locations.models import Location
+# from inventory.models import Inventory
 
 
 class Project(models.Model):
@@ -14,6 +15,18 @@ class Project(models.Model):
         COMMERCIAL = "COMMERCIAL", "Commercial"
         OTHER = "OTHER", "Other"
 
+    class ProjectStatus(models.TextChoices):
+        COMING_SOON = "COMING_SOON", "Coming Soon"
+        PRE_LAUNCH = "PRE_LAUNCH", "Pre Launch"
+        LAUNCHED = "LAUNCHED", "Launched"
+        UNDER_CONSTRUCTION = "UNDER_CONSTRUCTION", "Under Construction"
+        READY_TO_MOVE = "READY_TO_MOVE", "Ready to Move"
+        COMPLETED = "COMPLETED", "Completed"
+        SOLD_OUT = "SOLD_OUT", "Sold Out"
+        ON_HOLD = "ON_HOLD", "On Hold"
+        CANCELLED = "CANCELLED", "Cancelled"
+        INACTIVE = "INACTIVE", "Inactive"
+
     name = models.CharField(
         max_length=250
     )
@@ -21,13 +34,17 @@ class Project(models.Model):
     developer = models.ForeignKey(
         Developer,
         on_delete=models.PROTECT,
-        related_name="projects"
+        related_name="projects",
+        null=True,
+        blank=True,
     )
 
     location = models.ForeignKey(
         Location,
         on_delete=models.PROTECT,
-        related_name="projects"
+        related_name="projects",
+        null=True,
+        blank=True,
     )
 
     project_type = models.CharField(
@@ -90,6 +107,11 @@ class Project(models.Model):
         blank=True
     )
 
+    project_status = models.CharField(
+        max_length=30,
+        choices=ProjectStatus.choices,
+        default=ProjectStatus.COMING_SOON,
+    )
     is_active = models.BooleanField(
         default=True
     )
@@ -101,6 +123,17 @@ class Project(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
+    # @property
+    # def starting_inventory(self):
+    #     return (
+    #         self.inventory
+    #         .filter(
+    #             status=Inventory.Status.AVAILABLE,
+    #             current_price__isnull=False,
+    #         )
+    #         .order_by("current_price")
+    #         .first()
+    #     )
 
     def __str__(self):
         return self.name

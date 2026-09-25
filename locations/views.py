@@ -29,10 +29,21 @@ def location_create(request):
 
     if request.method == "POST":
 
+        name = request.POST.get("name", "").strip()
+
+        if Location.objects.filter(name__iexact=name).exists():
+            return render(
+                request,
+                "locations/form.html",
+                {
+                    "title": "Add Location",
+                    "location": None,
+                    "error": f'Location "{name}" already exists.',
+                },
+            )
+
         Location.objects.create(
-            name=request.POST.get(
-                "name", ""
-            ).strip(),
+            name=name,
 
             city=request.POST.get(
                 "city", ""
@@ -77,8 +88,6 @@ def location_create(request):
             "location": None,
         },
     )
-
-
 def location_detail(request, pk):
 
     location = get_object_or_404(

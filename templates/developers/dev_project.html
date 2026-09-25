@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ developer.name }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Developer Details
+{% endblock %}
+
+{% block content %}
+<!-- Projects Section -->
+<div class="card detail-card">
+
+    <div class="page-header">
+
+        <div>
+            <h2>Projects</h2>
+            <p>
+                {{property_type}} under {{ developer.name }}
+            </p>
+        </div>
+
+        <div class="dev_project_add_count">
+            <a href="{% url 'project_create' %}" class="dev_prjt_add_btn btn-primary">
+                {% if property_type != "ALL" %}
+                    + Add {{ property_type|title }}
+                {% else %}
+                    + Add Project
+                {% endif %}
+            </a>
+            <strong>
+                Total Projects: {{ project_count }}
+            </strong>
+        </div>
+
+    </div>
+
+
+    {% if projects %}
+
+        <div class="developer-project-grid">
+
+            {% for project in projects %}
+
+                <div class="developer-project-card ">
+
+                    <!-- Project Header -->
+                    <div class="developer-project-card-header">
+
+                        <div >
+                            <h3>
+                                {{ project.name }}
+                            </h3>
+
+                          
+                        </div>
+                          <!-- Three Dot Menu -->
+                    <details class="project-menu">
+
+                        <summary
+                            class="project-menu-button"
+                            aria-label="Project actions"
+                        >
+                            ⋮
+                        </summary>
+
+                        <div class="project-menu-dropdown">
+
+                            <a
+                                href="{% url 'project_edit' project.pk %}"
+                                class="project-menu-item"
+                            >
+                                <span>✎</span>
+                                Edit
+                            </a>
+
+                            <a
+                                href="{% url 'project_delete' project.pk %}"
+                                class="project-menu-item delete"
+                            >
+                                <span>🗑</span>
+                                Delete
+                            </a>
+
+                        </div>
+
+                    </details>
+
+                    </div>
+                  
+
+
+                    <!-- Location Active-->
+                    <div class="project-basic-grid">
+                        <div>
+                             {% if project.location %}
+                            <span>
+                                📍 {{ project.location.name }}
+                            </span>
+                            {% else %}
+                                <span>
+                                    📍 Location not available
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div  class="dev_isactive">
+                            {% if project.is_active %}
+                                <span class="badge badge-active">
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="badge badge-inactive">
+                                    Inactive
+                                </span>
+                            {% endif %}
+                        </div>
+                          
+
+                    </div>
+
+                
+
+
+                    <!-- Project Basic Details -->
+                    <div class="project-basic-grid">
+
+                        <div>
+                            <span class="detail-label">
+                                Type
+                            </span>
+
+                            <strong>
+                                {{ project.get_project_type_display }}
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span class="detail-label">
+                                BHK
+                            </span>
+
+                            <strong>
+                                {{ project.bhk|default:"—" }}
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span class="detail-label">
+                                Total Units
+                            </span>
+
+                            <strong>
+                                {{ project.total_units|default:"—" }}
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span class="detail-label">
+                                Possession
+                            </span>
+
+                            <strong>
+                                {% if project.possession_date %}
+                                    {{ project.possession_date|date:"M Y" }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                    </div>
+                    <div class="project-price-grid">
+
+                        <div>
+                            <span class="detail-label">
+                                Starting Price
+                            </span>
+
+                            <strong class="comma-format">
+                                {% if project.available_inventory %}
+                                    ₹{{ project.available_inventory.0.current_price|floatformat:0 }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </strong>
+                        </div>
+
+
+                        <div>
+                            <span class="detail-label">
+                                Price / SFT
+                            </span>
+
+                            <strong class="comma-format">
+                                {% if project.available_inventory.0.basic_sale_price_per_sq_ft %}
+                                    ₹{{ project.available_inventory.0.basic_sale_price_per_sq_ft|floatformat:0 }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <!-- RERA -->
+                    <div class="project-rera">
+
+                        <!-- <div>
+
+                            <span class="detail-label">
+                                RERA Number
+                            </span>
+
+                            <strong>
+                                {{ project.rera_number|default:"—" }}
+                            </strong>
+
+                        </div> -->
+                        
+                        <div>
+
+                            <span class="detail-label">
+                                RERA Status
+                            </span>
+
+                            <strong>
+                                {{ project.rera_status|default:"—" }}
+                            </strong>
+
+                        </div>
+                        <div>
+                            <span class="detail-label">
+                                Project Land
+                            </span>
+
+                            <strong>
+
+                                {% if project.total_land_acres %}
+                                    {{ project.total_land_acres }} Acres
+                                {% endif %}
+
+                                <!-- {% if project.total_land_guntas %}
+                                    {{ project.total_land_guntas }} Guntas
+                                {% endif %} -->
+
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Land -->
+                    <!-- {% if project.total_land_acres or project.total_land_guntas %}
+
+                        <div class="project-land">
+
+                            <span class="detail-label">
+                                Project Land
+                            </span>
+
+                            <strong>
+
+                                {% if project.total_land_acres %}
+                                    {{ project.total_land_acres }} Acres
+                                {% endif %}
+
+                                {% if project.total_land_guntas %}
+                                    {{ project.total_land_guntas }} Guntas
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+                    {% endif %} -->
+
+
+                    <!-- Actions -->
+                    <div class="developer-project-actions">
+
+                        <a
+                            href="{% url 'project_detail' project.pk %}"
+                            class="btn btn-primary">
+                            View Project
+                        </a>
+                        <a
+                            href="{% url 'project_inventory' project.id %}"
+                            class="btn btn-light">
+                            Inventory
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <p>
+                No {{property_type}} added for this developer yet.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+{% load static %}
+
+<script src="{% static 'js/number_format.js' %}"></script>
+{% endblock %}

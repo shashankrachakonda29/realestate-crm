@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+Delete Activity | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Delete Activity
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <h2>Delete Activity</h2>
+
+    <p>
+        Are you sure you want to delete this activity?
+    </p>
+
+    <p>
+        <strong>
+            {{ activity.get_activity_type_display }}
+        </strong>
+
+        {% if activity.subject %}
+            — {{ activity.subject }}
+        {% endif %}
+    </p>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <div class="form-actions">
+
+            <a
+                href="{% url 'lead_detail' lead.pk %}"
+                class="btn btn-light"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Delete Activity
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

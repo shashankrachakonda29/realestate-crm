@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ project.name }} - {{ bhk }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+{{ bhk }} Inventory
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header inventory-page-header">
+
+    <div>
+
+        <div class="breadcrumb-text">
+            <a href="{% url 'project_inventory' project.id %}">
+                Project Inventory
+            </a>
+
+            <span> / </span>
+
+            {{ bhk }}
+        </div>
+
+        <h1>{{ project.name }}</h1>
+
+        <p>
+            {{ bhk }} available units
+        </p>
+
+    </div>
+
+
+    <a
+        href="{% url 'project_inventory' project.id %}"
+        class="btn btn-light">
+        ← Back
+    </a>
+
+</div>
+
+
+<div class="inventory-section">
+
+    <div class="section-heading">
+
+        <div>
+            <h2>{{ bhk }} Units</h2>
+
+            <p>
+                {{ inventory|length }}
+                {% if inventory|length == 1 %}
+                    available unit
+                {% else %}
+                    available units
+                {% endif %}
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="unit-grid">
+
+        {% for item in inventory %}
+
+            <div class="unit-card">
+
+                <div class="unit-card-header">
+
+                    <div>
+                        <span class="unit-label">
+                            UNIT
+                        </span>
+
+                        <h3>
+                            {{ item.unit_number }}
+                        </h3>
+                    </div>
+
+                    <span class="unit-status">
+                        {{ item.get_status_display }}
+                    </span>
+
+                </div>
+
+
+                <div class="unit-card-details">
+
+                    <div class="unit-detail">
+
+                        <span>Configuration</span>
+
+                        <strong>
+                            {{ item.bhk }}
+                        </strong>
+
+                    </div>
+
+
+                    {% if item.unit_size_sq_ft %}
+
+                    <div class="unit-detail">
+
+                        <span>Area</span>
+
+                        <strong>
+                            {{ item.unit_size_sq_ft|floatformat:0 }}
+                            Sq.Ft
+                        </strong>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if item.facing %}
+
+                    <div class="unit-detail">
+
+                        <span>Facing</span>
+
+                        <strong>
+                            {{ item.facing }}
+                        </strong>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if item.property_type %}
+
+                    <div class="unit-detail">
+
+                        <span>Property Type</span>
+
+                        <strong>
+                            {{ item.get_property_type_display }}
+                        </strong>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="unit-card-footer">
+
+                    {% if item.current_price %}
+
+                    <div class="unit-price">
+
+                        <span>Current Price</span>
+
+                        <strong>
+                            ₹{{ item.current_price|floatformat:0 }}
+                        </strong>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <a
+                        href="#"
+                        class="btn btn-light btn-sm">
+                        View Details →
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-inventory">
+
+                <div class="empty-icon">
+                    —
+                </div>
+
+                <h3>No {{ bhk }} Units Available</h3>
+
+                <p>
+                    There are currently no available
+                    units for this configuration.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

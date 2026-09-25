@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ project.name }} Inventory | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Project Inventory
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header inventory-page-header">
+
+    <div>
+        <h1>{{ project.name }}</h1>
+
+        <p>
+            {% if project.location %}
+                {{ project.location.name }}, {{ project.location.city }}
+            {% endif %}
+        </p>
+    </div>
+
+    <a
+        href="{% url 'project_list' %}"
+        class="btn btn-light">
+        ← Back
+    </a>
+
+</div>
+
+
+<div class="inventory-section">
+
+    <div class="section-heading">
+
+        <div>
+            <h2>Available Configurations</h2>
+
+            <p>
+                Select a BHK to view available units.
+            </p>
+        </div>
+
+        <span class="inventory-total">
+            {{ project.total_units|default:"0" }} Total Units
+        </span>
+
+    </div>
+
+
+    <div class="bhk-grid">
+
+        {% for item in bhk_groups %}
+
+            <a
+                href="{% url 'project_inventory_bhk' project.id item.bhk %}"
+                class="bhk-card"
+            >
+
+                <!-- TOP -->
+
+                <div class="bhk-card-top">
+
+                    <div class="bhk-icon">
+                        {{ item.bhk }}
+                    </div>
+
+                    <span class="bhk-arrow">
+                        →
+                    </span>
+
+                </div>
+
+
+                <!-- CONTENT -->
+
+                <div class="bhk-card-content">
+
+                    <h3>
+                        {{ item.bhk }} BHK
+                    </h3>
+
+                    <p>
+                        {{ item.unit_count }}
+
+                        {% if item.unit_count == 1 %}
+                            Unit
+                        {% else %}
+                            Units
+                        {% endif %}
+                    </p>
+
+
+                    <!-- SIZE -->
+
+                    {% if item.min_sft %}
+
+                        <div class="bhk-detail-row">
+
+                            <span class="bhk-detail-label">
+                                Size
+                            </span>
+
+                            <strong>
+                                {{ item.min_sft|floatformat:0 }}
+                                –
+                                {{ item.max_sft|floatformat:0 }}
+                                Sq.Ft
+                            </strong>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- FACING -->
+
+                    {% if item.facings %}
+
+                        <div class="bhk-detail-row">
+
+                            <span class="bhk-detail-label">
+                                Facing
+                            </span>
+
+                            <strong>
+                                {% for facing in item.facings %}
+                                    {{ facing }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </strong>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- PRICE -->
+
+                    {% if item.min_price %}
+
+                        <div class="bhk-detail-row">
+
+                            <span class="bhk-detail-label">
+                                Price Starts
+                            </span>
+
+                            <strong class="bhk-price">
+                                ₹{{ item.min_price|floatformat:0 }}
+                            </strong>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- FOOTER -->
+
+                <div class="bhk-card-footer">
+
+                    <span>
+                        View {{ item.bhk }} BHK Units
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+
+                </div>
+
+            </a>
+
+        {% empty %}
+
+            <div class="empty-inventory">
+
+                <div class="empty-icon">
+                    —
+                </div>
+
+                <h3>
+                    No Inventory Available
+                </h3>
+
+                <p>
+                    No available inventory has been added
+                    to this project yet.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

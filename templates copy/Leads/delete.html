@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}
+Delete Lead | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Delete Lead
+{% endblock %}
+
+{% block content %}
+
+<div class="card detail-card">
+
+    <div class="delete-box">
+
+        <h2>Delete Lead?</h2>
+
+        <p>
+            Are you sure you want to delete
+            <strong>{{ lead.name }}</strong>?
+        </p>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <a
+                href="{% url 'lead_detail' lead.pk %}"
+                class="btn btn-light"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-danger"
+            >
+                Delete Lead
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

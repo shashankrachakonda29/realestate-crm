@@ -21,21 +21,20 @@ class Inventory(models.Model):
         ON_HOLD = "ON_HOLD", "On Hold"
         NOT_AVAILABLE = "NOT_AVAILABLE", "Not Available"
 
+    # REQUIRED
     project = models.ForeignKey(
         Project,
         on_delete=models.PROTECT,
         related_name="inventory",
     )
 
-    unit_number = models.CharField(
-        max_length=100,
-    )
-
+    # REQUIRED
     property_type = models.CharField(
         max_length=30,
         choices=PropertyType.choices,
     )
 
+    # OPTIONAL
     bhk = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
@@ -78,15 +77,31 @@ class Inventory(models.Model):
 
     facing = models.CharField(
         max_length=50,
+        null=True,
         blank=True,
     )
 
     floors = models.CharField(
         max_length=100,
+        null=True,
         blank=True,
     )
 
     current_price = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+
+    extra_built_up_rate_per_sq_ft = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+
+    basic_sale_price_2 = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         null=True,
@@ -120,6 +135,7 @@ class Inventory(models.Model):
         null=True,
         blank=True,
     )
+
     basic_sale_price_per_sq_ft = models.DecimalField(
         max_digits=15,
         decimal_places=2,
@@ -164,6 +180,7 @@ class Inventory(models.Model):
 
     unit_facing = models.CharField(
         max_length=50,
+        null=True,
         blank=True,
     )
 
@@ -187,6 +204,7 @@ class Inventory(models.Model):
     )
 
     commission_terms = models.TextField(
+        null=True,
         blank=True,
     )
 
@@ -197,6 +215,7 @@ class Inventory(models.Model):
 
     source = models.CharField(
         max_length=200,
+        null=True,
         blank=True,
     )
 
@@ -206,6 +225,7 @@ class Inventory(models.Model):
     )
 
     payment_plan = models.TextField(
+        null=True,
         blank=True,
     )
 
@@ -216,13 +236,16 @@ class Inventory(models.Model):
 
     rera_number = models.CharField(
         max_length=100,
+        null=True,
         blank=True,
     )
 
     amenities = models.TextField(
+        null=True,
         blank=True,
     )
 
+    # Optional because it already has a default
     status = models.CharField(
         max_length=30,
         choices=Status.choices,
@@ -230,25 +253,32 @@ class Inventory(models.Model):
     )
 
     notes = models.TextField(
+        null=True,
         blank=True,
     )
+
     brochure_url = models.URLField(
+        null=True,
         blank=True,
     )
 
     price_sheet_url = models.URLField(
+        null=True,
         blank=True,
     )
 
     inventory_sheet_url = models.URLField(
+        null=True,
         blank=True,
     )
 
     website_url = models.URLField(
+        null=True,
         blank=True,
     )
 
     google_maps_url = models.URLField(
+        null=True,
         blank=True,
     )
 
@@ -261,4 +291,4 @@ class Inventory(models.Model):
     )
 
     def __str__(self):
-        return f"{self.project.name} - {self.unit_number}"  
+        return self.project.name

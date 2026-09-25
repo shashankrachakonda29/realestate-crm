@@ -6,6 +6,7 @@ from .views import (
     developer_detail,
     developer_edit,
     developer_list,
+    developer_projects,
 )
 
 
@@ -27,7 +28,11 @@ urlpatterns = [
         developer_detail,
         name="developer_detail",
     ),
-
+    path(
+        "<int:pk>/projects/",
+        developer_projects,
+        name="developer_projects",
+    ),
     path(
         "<int:pk>/edit/",
         developer_edit,
@@ -39,4 +44,5 @@ urlpatterns = [
         developer_delete,
         name="developer_delete",
     ),
+   
 ]

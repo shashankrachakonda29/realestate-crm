@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}
+Delete Site Visit | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Delete Site Visit
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Delete Site Visit</h1>
+        <p>This action cannot be undone.</p>
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Confirm Delete</h2>
+
+    <p>
+        Are you sure you want to delete the site visit for
+        <strong>{{ site_visit.lead.name }}</strong>
+        at
+        <strong>{{ site_visit.project.name }}</strong>?
+    </p>
+
+    <div class="form-actions">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Yes, Delete
+            </button>
+
+        </form>
+
+        <a
+            href="{% url 'sitevisit_detail' site_visit.pk %}"
+            class="btn btn-light"
+        >
+            Cancel
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

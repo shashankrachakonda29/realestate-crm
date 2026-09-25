@@ -32,12 +32,10 @@
 
         {% csrf_token %}
 
-
         <div class="form-grid">
 
 
             <!-- Project Name -->
-
             <div class="form-group">
 
                 <label>
@@ -56,7 +54,6 @@
 
 
             <!-- Developer -->
-
             <div class="form-group">
 
                 <label>
@@ -79,9 +76,7 @@
                             selected
                         {% endif %}
                     >
-
                         {{ developer.name }}
-
                     </option>
 
                     {% endfor %}
@@ -92,7 +87,6 @@
 
 
             <!-- Location -->
-
             <div class="form-group">
 
                 <label>
@@ -115,9 +109,7 @@
                             selected
                         {% endif %}
                     >
-
                         {{ location.name }}, {{ location.city }}
-
                     </option>
 
                     {% endfor %}
@@ -128,7 +120,6 @@
 
 
             <!-- Project Type -->
-
             <div class="form-group">
 
                 <label>
@@ -155,13 +146,46 @@
                     </option>
 
                     {% endfor %}
+
                 </select>
 
             </div>
 
 
-            <!-- Land Acres -->
+            <!-- Project Status -->
+            <div class="form-group">
 
+                <label>
+                    Project Status *
+                </label>
+
+                <select
+                    name="project_status"
+                    required>
+
+                    <option value="">
+                        Select Status
+                    </option>
+
+                    {% for value, label in project_status %}
+
+                    <option
+                        value="{{ value }}"
+                        {% if project.project_status == value %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ label }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+           
+
+            <!-- Land Acres -->
             <div class="form-group">
 
                 <label>
@@ -179,7 +203,6 @@
 
 
             <!-- Land Guntas -->
-
             <div class="form-group">
 
                 <label>
@@ -197,7 +220,6 @@
 
 
             <!-- Total Units -->
-
             <div class="form-group">
 
                 <label>
@@ -215,7 +237,6 @@
 
 
             <!-- BHK -->
-
             <div class="form-group">
 
                 <label>
@@ -233,7 +254,6 @@
 
 
             <!-- Possession -->
-
             <div class="form-group">
 
                 <label>
@@ -250,7 +270,6 @@
 
 
             <!-- RERA Number -->
-
             <div class="form-group">
 
                 <label>
@@ -268,7 +287,6 @@
 
 
             <!-- RERA Status -->
-
             <div class="form-group">
 
                 <label>
@@ -286,7 +304,6 @@
 
 
             <!-- Website -->
-
             <div class="form-group">
 
                 <label>
@@ -304,7 +321,6 @@
 
 
             <!-- Google Maps -->
-
             <div class="form-group">
 
                 <label>
@@ -322,7 +338,6 @@
 
 
             <!-- Amenities -->
-
             <div class="form-group full-width">
 
                 <label>
@@ -339,7 +354,6 @@
 
 
             <!-- Description -->
-
             <div class="form-group full-width">
 
                 <label>
@@ -353,30 +367,13 @@
                 >{{ project.description|default:'' }}</textarea>
 
             </div>
-
-
-            <!-- Status -->
-
-            <div class="form-group">
-
-                <label>
-                    Status
-                </label>
-
-                <label class="checkbox">
-
-                    <input
-                        type="checkbox"
-                        name="is_active"
-                        {% if project is None or project.is_active %}
-                            checked
-                        {% endif %}
-                    >
-
-                    Active
-
-                </label>
-
+             <!-- Active Status --> 
+            <div class="form-group"> 
+                <label> Status </label> 
+                <label class="checkbox"> 
+                    <input type="checkbox" name="is_active" {% if project is None or project.is_active %} checked {% endif %} >
+                     Active 
+                    </label> 
             </div>
 
 

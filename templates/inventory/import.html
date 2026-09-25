@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}
+Import Inventory | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Import Inventory
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Import Inventory</h1>
+
+        <p>Upload Multiple Property Documents</p>
+        <p>Upload brochure, price sheet, voucher, floor plan, payment sheet and other project documents together.</p>
+    </div>
+
+    <a
+        href="{% url 'inventory_list' %}"
+        class="btn btn-light"
+    >
+        ← Back to Inventory
+    </a>
+
+</div>
+
+
+<div class="card">
+
+    {% if error %}
+        <div class="alert alert-danger">
+            {{ error }}
+        </div>
+    {% endif %}
+
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+    >
+
+        {% csrf_token %}
+
+        <div class="filter-group">
+
+            <label for="property_files">
+                Choose PDF / Image files
+            </label>
+
+            <input
+                id="property_files"
+                type="file"
+                name="property_files"
+                accept=".pdf,.jpg,.jpeg,.png"
+                multiple
+                required
+            >
+
+            <div id="selected-files" style="margin-top: 10px;"></div>
+
+        </div>
+
+
+        <div style="margin-top: 20px;">
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Extract Property Details
+            </button>
+
+            <a
+                href="{% url 'inventory_list' %}"
+                class="btn btn-light"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+    <hr style="margin: 24px 0;">
+
+    <h2>Import JSON</h2>
+    <p>Upload structured inventory JSON for verification before saving.</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="filter-group">
+            <label for="json_file">JSON file</label>
+            <input id="json_file" type="file" name="json_file" accept=".json" required>
+            <div id="selected-json-file" style="margin-top: 10px;"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Verify JSON</button>
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const fileInput = document.getElementById("property_files");
+    const selectedFiles = document.getElementById("selected-files");
+    const maximumSize = 50 * 1024 * 1024;
+    fileInput.addEventListener("change", () => {
+        selectedFiles.innerHTML = "";
+        for (const file of fileInput.files) {
+            const item = document.createElement("div");
+            item.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            if (file.size > maximumSize) {
+                item.style.color = "#b42318";
+                item.textContent += " - maximum 50 MB per file";
+            }
+            selectedFiles.appendChild(item);
+        }
+    });
+    const jsonInput = document.getElementById("json_file");
+    const selectedJsonFile = document.getElementById("selected-json-file");
+    jsonInput.addEventListener("change", () => {
+        selectedJsonFile.textContent = jsonInput.files.length ? jsonInput.files[0].name : "";
+    });
+</script>
+{% endblock %}

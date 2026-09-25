@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}
+Users | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+User Management
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Users</h1>
+        <p>Manage CRM users and their roles.</p>
+    </div>
+
+    <a
+        href="{% url 'user_create' %}"
+        class="btn btn-primary"
+    >
+        + Add User
+    </a>
+
+</div>
+
+
+<div class="card">
+
+    {% if users %}
+
+    <div class="table-responsive">
+
+        <table class="data-table">
+
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for user in users %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ user.username }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        {{ user.first_name }}
+                        {{ user.last_name }}
+                    </td>
+
+                    <td>
+                        {{ user.email|default:"—" }}
+                    </td>
+
+                    <td>
+                        {{ user.get_role_display }}
+                    </td>
+
+                    <td>
+                        {{ user.phone|default:"—" }}
+                    </td>
+
+                    <td>
+
+                        {% if user.is_active %}
+                            <span class="badge badge-active">Active</span>
+                        {% else %}
+                            <span class="badge badge-inactive">Inactive</span>
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <div class="form-actions">
+
+                            <a
+                                href="{% url 'user_edit' user.pk %}"
+                                class="btn btn-light"
+                            >
+                                Edit
+                            </a>
+
+                            <a
+                                href="{% url 'user_password' user.pk %}"
+                                class="btn btn-light"
+                            >
+                                Password
+                            </a>
+
+                            {% if user.pk != request.user.pk %}
+
+                                <form
+                                    method="post"
+                                    action="{% url 'user_toggle_active' user.pk %}"
+                                    style="display:inline;"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-light"
+                                    >
+                                        {% if user.is_active %}
+                                            Deactivate
+                                        {% else %}
+                                            Activate
+                                        {% endif %}
+                                    </button>
+
+                                </form>
+
+                                <a
+                                    href="{% url 'user_delete' user.pk %}"
+                                    class="btn btn-light"
+                                >
+                                    Delete
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <h3>No users found</h3>
+
+        <p>
+            Create your first CRM user.
+        </p>
+
+        <a
+            href="{% url 'user_create' %}"
+            class="btn btn-primary"
+        >
+            + Add User
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

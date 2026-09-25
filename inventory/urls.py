@@ -6,6 +6,7 @@ from .views import (
     inventory_detail,
     inventory_edit,
     inventory_list,
+    inventory_import,
 )
 
 
@@ -21,6 +22,12 @@ urlpatterns = [
         "add/",
         inventory_create,
         name="inventory_create",
+    ),
+
+    path(
+        "import/",
+        inventory_import,
+        name="inventory_import",
     ),
 
     path(

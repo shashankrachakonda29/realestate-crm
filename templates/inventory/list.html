@@ -1,420 +1,111 @@
 {% extends "base.html" %}
-
-{% block title %}
-Inventory | Property CRM
-{% endblock %}
-
-{% block page_heading %}
-Inventory
-{% endblock %}
-
+{% block title %}Inventory | Property CRM{% endblock %}
+{% block page_heading %}Inventory{% endblock %}
 {% block content %}
+<div class="page-header"><div><h1>Inventory</h1><p>Manage property units and availability.</p></div><div style="display:flex;gap:10px"><a href="{% url 'inventory_create' %}" class="btn btn-primary">+ Add Inventory</a><a href="{% url 'inventory_import' %}" class="btn btn-light">Import PDF / Image</a></div></div>
+<div class="card"><form method="get" class="inventory-filters">
+<div class="filter-group search-filter"><label>Search Project</label><input type="text" name="search" value="{{ search }}" placeholder="Project name..."></div>
+<div class="filter-group"><label>Project</label><select name="project"><option value="">All Projects</option>{% for project in projects %}<option value="{{ project.id }}" {% if selected_project|stringformat:"s" == project.id|stringformat:"s" %}selected{% endif %}>{{ project.name }}</option>{% endfor %}</select></div>
+<div class="filter-group"><label>Location</label><select name="location"><option value="">All Locations</option>{% for location in locations %}<option value="{{ location.location_id }}" {% if selected_location|stringformat:"s" == location.location_id|stringformat:"s" %}selected{% endif %}>{{ location.location__name }}</option>{% endfor %}</select></div>
+<div class="filter-group"><label>Property Type</label><select name="property_type"><option value="">All Types</option>{% for value, label in property_types %}<option value="{{ value }}" {% if selected_property_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+<div class="filter-group"><label>Status</label><select name="status"><option value="">All Status</option>{% for value, label in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+<div class="filter-group"><label>BHK</label><select name="bhk"><option value="">All BHK</option>{% for number in "123456" %}<option value="{{ number }}" {% if selected_bhk == number %}selected{% endif %}>{{ number }} BHK</option>{% endfor %}</select></div>
+<div class="filter-actions"><button type="submit" class="btn btn-primary">Filter</button><a href="{% url 'inventory_list' %}" class="btn btn-light">Clear</a></div></form>
+<div class="table-container inventory-table-wrapper"><table class="inventory-table"><thead><tr><th>Project</th><th>Developer</th><th>Location</th><th>Property Type</th><th>BHK</th><th>Plot Yds</th><th>Plot Ft</th><th>Saleable Ft</th><th>Built-up Ft</th><th>Extra Built-up Ft</th><th>Facing</th><th>Floors</th><th>Current Price(Cr)</th><th>Extra Rate</th><th>Additional Basic Price</th><th>GST</th><th>Total Cost (Cr)</th><th>Discount</th><th>Booking</th><th>Basic Price/Sq Ft</th><th>Basic Price (Cr)</th><th>Amenities Charges</th><th>Facing Charges</th><th>Price/Sq Ft Incl GST</th><th>Unit Size</th><th>Unit Facing</th><th>Unit Price (Cr)</th><th>Available</th><th>Commission %</th><th>Commission Terms</th><th>Offer Valid Till</th><th>Source</th><th>Date Received</th><th>Payment Plan</th><th>Possession</th><th>RERA</th><th>Amenities</th><th>Status</th><th>Notes</th><th>Brochure URL</th><th>Price Sheet URL</th><th>Inventory Sheet URL</th><th>Website URL</th><th>Maps URL</th><th>Created</th><th>Updated</th><th>Actions</th></tr></thead><tbody>
+{% for item in inventory %}
+<tr>
 
-<div class="page-header">
+    <td>{{ item.project.name }}</td>
+    <td>{{ item.project.developer.name }}</td>
+    <td>{{ item.project.location.name }}</td>
+    <td>{{ item.get_property_type_display }}</td>
+    <td>{{ item.bhk|default:"—" }}</td>
 
-    <div>
-        <h1>Inventory</h1>
-        <p>Manage property units and availability.</p>
-    </div>
+    <!-- Property Details -->
+    <td class="comma-format">{{ item.plot_size_sq_yards|default:"0" }}</td>
+    <td class="comma-format">{{ item.plot_size_sq_ft|default:"0" }}</td>
+    <td class="comma-format">{{ item.saleable_area_sq_ft|default:"0" }}</td>
+    <td class="comma-format">{{ item.built_up_area_sq_ft|default:"0" }}</td>
+    <td class="comma-format">{{ item.extra_built_up_area_sq_ft|default:"0" }}</td>
 
-    <a href="{% url 'inventory_create' %}" class="btn btn-primary">
-        + Add Inventory
-    </a>
+    <td>{{ item.facing|default:"—" }}</td>
+    <td>{{ item.floors|default:"0" }}</td>
 
-</div>
+    <!-- Pricing -->
+    <td>₹ <span class="comma-format">{{ item.current_price|default:"0" }}</span></td>
 
+    <td>₹ <span class="comma-format">{{ item.extra_built_up_rate_per_sq_ft|default:"0" }}</span></td>
 
-<div class="card">
+    <td>₹ <span class="comma-format">{{ item.basic_sale_price_2|default:"0" }}</span></td>
 
-    <!-- FILTERS -->
-    <form method="get" class="inventory-filters">
+    <td>₹ <span class="comma-format">{{ item.gst_amount|default:"0" }}</span></td>
 
-        <!-- Search -->
-        <div class="filter-group search-filter">
+    <td>₹ <span class="comma-format">{{ item.total_unit_cost|default:"0" }}</span></td>
 
-            <label>Search Unit</label>
+    <td>₹ <span class="comma-format">{{ item.discount|default:"0" }}</span></td>
 
-            <input
-                type="text"
-                name="search"
-                value="{{ search }}"
-                placeholder="Villa 101..."
-            >
+    <td>₹ <span class="comma-format">{{ item.booking_amount|default:"0" }}</span></td>
 
-        </div>
+    <td>₹ <span class="comma-format">{{ item.basic_sale_price_per_sq_ft|default:"0" }}</span></td>
 
+    <td>₹ <span class="comma-format">{{ item.basic_sale_price|default:"0" }}</span></td>
 
-        <!-- Project -->
-        <div class="filter-group">
+    <td>₹ <span class="comma-format">{{ item.amenities_charges|default:"0" }}</span></td>
 
-            <label>Project</label>
+    <td>₹ <span class="comma-format">{{ item.facing_charges|default:"0" }}</span></td>
 
-            <select name="project">
+    <td>₹ <span class="comma-format">{{ item.price_per_sq_ft_incl_gst|default:"0" }}</span></td>
 
-                <option value="">
-                    All Projects
-                </option>
+    <td class="comma-format">{{ item.unit_size_sq_ft|default:"0" }}</td>
 
-                {% for project in projects %}
+    <td>{{ item.unit_facing|default:"—" }}</td>
 
-                <option
-                    value="{{ project.id }}"
-                    {% if selected_project == project.id|stringformat:"s" %}
-                        selected
-                    {% endif %}
-                >
-                    {{ project.name }}
-                </option>
+    <td>₹ <span class="comma-format">{{ item.unit_price|default:"0" }}</span></td>
 
-                {% endfor %}
+    <td class="comma-format">{{ item.available_units|default:"0" }}</td>
 
-            </select>
+    <td>{{ item.cp_commission_percent|default:"—" }}</td>
+    <td>{{ item.commission_terms|default:"—" }}</td>
+    <td>{{ item.offer_valid_till|default:"—" }}</td>
+    <td>{{ item.source|default:"—" }}</td>
+    <td>{{ item.date_received|default:"—" }}</td>
+    <td>{{ item.payment_plan|default:"—" }}</td>
+    <td>{{ item.possession_date|default:"—" }}</td>
+    <td>{{ item.rera_number|default:"—" }}</td>
+    <td>{{ item.amenities|default:"—" }}</td>
+    <td>{{ item.get_status_display }}</td>
+    <td>{{ item.notes|default:"—" }}</td>
 
-        </div>
+    <!-- URLs -->
+    <td>{{ item.brochure_url|default:"—" }}</td>
+    <td>{{ item.price_sheet_url|default:"—" }}</td>
+    <td>{{ item.inventory_sheet_url|default:"—" }}</td>
+    <td>{{ item.website_url|default:"—" }}</td>
+    <td>{{ item.google_maps_url|default:"—" }}</td>
 
+    <!-- Dates -->
+    <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
+    <td>{{ item.updated_at|date:"Y-m-d H:i" }}</td>
 
-        <!-- Location -->
-        <div class="filter-group">
+    <!-- Actions -->
+    <td>
+        <a href="{% url 'inventory_detail' item.pk %}" class="action-link">View</a>
+        <a href="{% url 'inventory_edit' item.pk %}" class="action-link">Edit</a>
+    </td>
 
-            <label>Location</label>
+</tr>
 
-            <select name="location">
+{% empty %}
 
-                <option value="">
-                    All Locations
-                </option>
+<tr>
+    <td colspan="47" class="empty-state">
+        No inventory records found.
+    </td>
+</tr>
 
-                {% for location in locations %}
+{% endfor %}
+</tbody></table></div>{% if page_obj.paginator.num_pages > 1 %}<nav class="inventory-pagination">{% if page_obj.has_previous %}<a href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}</div>
+{% load static %}
 
-                <option
-                    value="{{ location.location_id }}"
-                    {% if selected_location == location.location_id|stringformat:"s" %}
-                        selected
-                    {% endif %}
-                >
-                    {{ location.location__name }}
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-
-        <!-- Property Type -->
-        <div class="filter-group">
-
-            <label>Property Type</label>
-
-            <select name="property_type">
-
-                <option value="">
-                    All Types
-                </option>
-
-                {% for value, label in property_types %}
-
-                <option
-                    value="{{ value }}"
-                    {% if selected_property_type == value %}
-                        selected
-                    {% endif %}
-                >
-                    {{ label }}
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-
-        <!-- Status -->
-        <div class="filter-group">
-
-            <label>Status</label>
-
-            <select name="status">
-
-                <option value="">
-                    All Status
-                </option>
-
-                {% for value, label in statuses %}
-
-                <option
-                    value="{{ value }}"
-                    {% if selected_status == value %}
-                        selected
-                    {% endif %}
-                >
-                    {{ label }}
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-
-        <!-- BHK -->
-        <div class="filter-group">
-
-            <label>BHK</label>
-
-            <select name="bhk">
-
-                <option value="">
-                    All BHK
-                </option>
-
-                {% for number in "123456" %}
-
-                <option
-                    value="{{ number }}"
-                    {% if selected_bhk == number %}
-                        selected
-                    {% endif %}
-                >
-                    {{ number }} BHK
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-
-        <!-- Buttons -->
-        <div class="filter-actions">
-
-            <button
-                type="submit"
-                class="btn btn-primary">
-                Filter
-            </button>
-
-            <a
-                href="{% url 'inventory_list' %}"
-                class="btn btn-light">
-                Clear
-            </a>
-
-        </div>
-
-    </form>
-
-
-    <!-- TABLE -->
-
-    <div class="table-container">
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>Unit</th>
-                    <th>Project</th>
-                    <th>Developer</th>
-                    <th>Location</th>
-                    <th>Type</th>
-                    <th>BHK</th>
-                    <th>Price</th>
-                    <th>Price/SFT</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                {% for item in inventory %}
-
-                <tr>
-
-                    <!-- UNIT -->
-
-                    <td>
-                        <strong>
-                            {{ item.unit_number }}
-                        </strong>
-                    </td>
-
-
-                    <!-- PROJECT -->
-
-                    <td>
-                        {{ item.project.name }}
-                    </td>
-
-
-                    <!-- DEVELOPER -->
-
-                    <td>
-                        {{ item.project.developer.name }}
-                    </td>
-
-
-                    <!-- LOCATION -->
-
-                    <td>
-                        {{ item.project.location.name }}
-                    </td>
-
-
-                    <!-- TYPE -->
-
-                    <td>
-                        {{ item.get_property_type_display }}
-                    </td>
-
-
-                    <!-- BHK -->
-
-                    <td>
-                        {{ item.bhk|default:"—" }}
-                    </td>
-
-
-                    <!-- PRICE -->
-
-                    <td>
-
-                        {% if item.total_unit_cost %}
-
-                            ₹{{ item.total_unit_cost|floatformat:0 }}
-
-                        {% elif item.current_price %}
-
-                            ₹{{ item.current_price|floatformat:0 }}
-
-                        {% else %}
-
-                            —
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <!-- PRICE / SFT -->
-
-                    <td>
-
-                        {% if item.price_per_sq_ft_incl_gst %}
-
-                            ₹{{ item.price_per_sq_ft_incl_gst|floatformat:0 }}
-
-                        {% else %}
-
-                            —
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <!-- STATUS -->
-
-                    <td>
-
-                        {% if item.status == "AVAILABLE" %}
-
-                            <span class="status-badge status-available">
-                                Available
-                            </span>
-
-                        {% elif item.status == "BLOCKED" %}
-
-                            <span class="status-badge status-blocked">
-                                Blocked
-                            </span>
-
-                        {% elif item.status == "BOOKED" %}
-
-                            <span class="status-badge status-booked">
-                                Booked
-                            </span>
-
-                        {% elif item.status == "SOLD" %}
-
-                            <span class="status-badge status-sold">
-                                Sold
-                            </span>
-
-                        {% elif item.status == "ON_HOLD" %}
-
-                            <span class="status-badge status-hold">
-                                On Hold
-                            </span>
-
-                        {% else %}
-
-                            <span class="status-badge status-not-available">
-                                Not Available
-                            </span>
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <!-- ACTIONS -->
-
-                    <td>
-
-                        <div class="actions">
-
-                            <a
-                                href="{% url 'inventory_detail' item.pk %}"
-                                class="action-link">
-                                View
-                            </a>
-
-                            <a
-                                href="{% url 'inventory_edit' item.pk %}"
-                                class="action-link">
-                                Edit
-                            </a>
-
-                        </div>
-
-                    </td>
-
-                </tr>
-
-
-                {% empty %}
-
-                <tr>
-
-                    <td
-                        colspan="10"
-                        class="empty-state">
-
-                        No inventory records found.
-
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
+<script src="{% static 'js/number_format.js' %}"></script>
 {% endblock %}

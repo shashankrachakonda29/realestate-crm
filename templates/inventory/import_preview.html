@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Review Property Import | Property CRM{% endblock %}
+{% block page_heading %}Review Property Import{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Review Extracted Property Details</h1><p>Review every configuration before importing it into Inventory.</p></div><a href="{% url 'inventory_list' %}" class="btn btn-light">Back to Inventory</a></div>
+{% if errors %}<div class="alert alert-danger">{% for error in errors %}<div>{{ error }}</div>{% endfor %}</div>{% endif %}
+{% if mapping_warnings %}<div class="alert alert-warning">{% for warning in mapping_warnings %}<div>ℹ {{ warning }}</div>{% endfor %}</div>{% endif %}
+{% if field_report %}
+<div class="card form-card">
+	<h2>JSON Verification</h2>
+	<p><strong>Mapped fields:</strong> {{ field_report.mapped_fields|join:", "|default:"None" }}</p>
+	<p><strong>Missing fields:</strong> {{ field_report.missing_fields|join:", "|default:"None" }}</p>
+	<p><strong>Unmapped fields:</strong></p>
+	{% for field, reason in field_report.unmapped_fields.items %}<div>{{ field }}: {{ reason }}</div>{% endfor %}
+	{% if field_report.invalid_fields %}<p><strong>Invalid fields:</strong></p>{% for error in field_report.invalid_fields %}<div>{{ error }}</div>{% endfor %}{% endif %}
+</div>
+{% endif %}
+<form method="post">{% csrf_token %}<input type="hidden" name="confirm_import" value="1">
+<div class="card form-card"><h2>Project Details</h2><p><strong>Project Status:</strong> {{ project_status }}</p><div class="form-grid"><div class="form-group"><label>Project Name</label><input value="{% if resolved_project %}{{ resolved_project.name }}{% else %}{{ project_data.name|default:'' }}{% endif %}" readonly></div><div class="form-group"><label>Developer</label><input value="{% if resolved_developer %}{{ resolved_developer.name }}{% else %}{{ data.developer|default:'' }}{% endif %}" readonly><small>Status: {{ developer_status }} Developer</small></div><div class="form-group"><label>Location</label><input value="{% if resolved_location %}{{ resolved_location }}{% else %}{{ data.location|default:'' }}{% endif %}" readonly><small>Status: {{ location_status }} Location</small></div><div class="form-group"><label>Property Type</label><input value="{% if resolved_project %}{{ resolved_project.get_project_type_display }}{% else %}{{ data.property_type|default:'' }}{% endif %}" readonly></div><div class="form-group"><label for="rera_number">RERA</label><input name="rera_number" id="rera_number" value="{{ rera_number|default:'' }}"></div><div class="form-group"><label for="amenities">Amenities</label><input name="amenities" id="amenities" value="{{ amenities|default:'' }}"></div></div><h3>Uploaded Documents</h3>{% for document in source_documents %}<div>✓ {{ document }}</div>{% empty %}<div>No source documents.</div>{% endfor %}</div>
+{% if configuration_rows %}<div class="card form-card" style="overflow-x:auto"><table><thead><tr>{% for field in preview_fields %}<th>{{ field|title }}</th>{% endfor %}<th>Status</th></tr></thead><tbody>{% for row in configuration_rows %}<tr>{% for label, field, value in row.fields %}<td><input aria-label="{{ label }} configuration {{ forloop.parentloop.parentloop.counter }}" name="config_{{ row.index }}_{{ field }}" value="{{ value|default:'' }}"></td>{% endfor %}<td><strong>{{ row.status }}</strong></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="card"><div class="alert alert-danger">Gemini did not return any property configurations.</div></div>{% endif %}
+<div class="card" style="display:flex;gap:10px"><button type="submit" class="btn btn-primary">Verify &amp; Save</button><button type="submit" name="cancel_import" value="1" class="btn btn-light">Cancel</button></div></form>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container mt-4 lead-import-page">
+
+    <div class="lead-import-header">
+
+        <div>
+            <h2>Map Lead Columns</h2>
+
+            <p class="text-muted mb-0">
+                File:
+                <strong>{{ filename }}</strong>
+                |
+                {{ row_count }} rows found
+            </p>
+        </div>
+
+          <a href="{% url 'lead_import' %}"
+              class="btn btn-secondary lead-import-back">
+            Back
+        </a>
+
+    </div>
+
+
+    {% if error %}
+
+        <div class="alert alert-danger lead-import-error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <div class="lead-import-card">
+
+        <div class="lead-import-card-body">
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="lead-import-preview">
+
+                    <table class="lead-mapping-table">
+
+                        <thead>
+
+                            <tr>
+                                <th class="lead-mapping-field">
+                                    CRM Lead Field
+                                </th>
+
+                                <th class="lead-mapping-source">
+                                    Excel / CSV Column
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for field in lead_fields %}
+
+                                <tr>
+
+                                    <td class="lead-mapping-row {% if field.required %}lead-mapping-required{% endif %}">
+
+                                        <strong>
+                                            {{ field.label }}
+                                        </strong>
+
+                                        {% if field.required %}
+
+                                            <span class="text-danger">
+                                                *
+                                            </span>
+
+                                        {% endif %}
+
+                                        <br>
+
+                                            <small class="lead-mapping-field-name">
+                                            {{ field.name }}
+                                        </small>
+
+                                    </td>
+
+                                    <td>
+
+                                        <select
+                                            name="mapping_{{ field.name }}"
+                                            class="form-select lead-mapping-select"
+                                            {% if field.required %}required{% endif %}
+                                        >
+
+                                            <option value="">
+                                                -- Do not import --
+                                            </option>
+
+                                            {% for column in columns %}
+
+                                                <option value="{{ column }}"
+                                                    {% if field.suggested == column or field.selected == column %}selected{% endif %}>
+                                                    {{ column }}
+                                                </option>
+
+                                            {% endfor %}
+
+                                        </select>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="alert alert-info lead-import-message">
+
+                    <strong>Important:</strong>
+
+                    Name and Phone are required.
+                    Other fields can be left unmapped.
+
+                </div>
+
+
+                <div class="lead-import-form-actions">
+
+                    <a href="{% url 'lead_import' %}"
+                       class="btn btn-secondary">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Import Leads
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

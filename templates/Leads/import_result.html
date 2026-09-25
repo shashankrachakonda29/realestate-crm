@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4 lead-import-page">
+
+    <div class="lead-import-header">
+
+        <div>
+            <h2>Lead Import Result</h2>
+
+            <p class="text-muted mb-0">
+                Import processing completed.
+            </p>
+        </div>
+
+          <a href="{% url 'lead_list' %}"
+              class="btn btn-primary lead-import-submit">
+            Go to Leads
+        </a>
+
+    </div>
+
+
+    <div class="lead-import-summary">
+
+        <div class="lead-import-stat">
+
+            <div class="lead-import-stat-card">
+
+                <div class="card-body">
+
+                    <span class="lead-import-stat-label">Total Rows</span>
+
+                    <strong class="lead-import-stat-value">
+                        {{ total_rows }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="lead-import-stat">
+
+            <div class="lead-import-stat-card">
+
+                <div class="card-body">
+
+                    <span class="lead-import-stat-label">Imported</span>
+
+                    <strong class="lead-import-stat-value lead-import-stat-success">
+                        {{ imported_count }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="lead-import-stat">
+
+            <div class="lead-import-stat-card">
+
+                <div class="card-body">
+
+                    <span class="lead-import-stat-label">Skipped Duplicates</span>
+
+                    <strong class="lead-import-stat-value lead-import-stat-warning">
+                        {{ skipped_duplicates }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="lead-import-summary lead-import-summary-secondary">
+        <div class="lead-import-stat"><div class="lead-import-stat-card"><span class="lead-import-stat-label">Validation Errors</span><strong class="lead-import-stat-value lead-import-stat-error">{{ validation_errors }}</strong></div></div>
+        <div class="lead-import-stat"><div class="lead-import-stat-card"><span class="lead-import-stat-label">Project Warnings</span><strong class="lead-import-stat-value lead-import-stat-warning">{{ project_warnings }}</strong></div></div>
+        <div class="lead-import-stat"><div class="lead-import-stat-card"><span class="lead-import-stat-label">User Warnings</span><strong class="lead-import-stat-value lead-import-stat-warning">{{ user_warnings }}</strong></div></div>
+    </div>
+
+
+    {% if details %}
+
+        <div class="lead-import-card lead-import-details-card">
+
+            <div class="lead-import-card-header">
+                <strong>Import Details</strong>
+            </div>
+
+            <div class="lead-import-card-body">
+
+                <div class="lead-import-preview">
+
+                    <table class="lead-import-result-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Row</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Result</th>
+                                <th>Reason</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for detail in details %}
+
+                                <tr class="{% if 'Imported' in detail.result %}lead-result-imported{% elif 'Skipped' in detail.result %}lead-result-skipped{% elif 'Error' in detail.result %}lead-result-error{% endif %}">
+
+                                    <td>
+                                        {{ detail.row }}
+                                    </td>
+
+                                    <td>
+                                        {{ detail.name }}
+                                    </td>
+                                    <td>{{ detail.phone }}</td>
+                                    <td>{{ detail.result }}</td>
+                                    <td>{{ detail.reason }}</td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+    <div class="mt-4">
+
+        <a href="{% url 'lead_import' %}"
+           class="btn btn-outline-primary">
+            Import Another File
+        </a>
+
+        <a href="{% url 'lead_list' %}"
+           class="btn btn-secondary">
+            Lead List
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

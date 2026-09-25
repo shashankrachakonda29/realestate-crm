@@ -62,22 +62,12 @@ Project Details
         <div>
 
             <span class="detail-label">
-                Status
+                Project Status
             </span>
 
-            {% if project.is_active %}
-
-            <span class="badge badge-active">
-                Active
-            </span>
-
-            {% else %}
-
-            <span class="badge badge-inactive">
-                Inactive
-            </span>
-
-            {% endif %}
+            <span class="badge badge-project-status status-{{ project.project_status|lower }}">
+                            {{ project.get_project_status_display }}
+                        </span>
 
         </div>
 

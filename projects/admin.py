@@ -11,6 +11,7 @@ class ProjectAdmin(admin.ModelAdmin):
         "developer",
         "location",
         "project_type",
+        "project_status",
         "total_land_acres",
         "total_units",
         "rera_status",
@@ -20,6 +21,7 @@ class ProjectAdmin(admin.ModelAdmin):
 
     list_filter = (
         "project_type",
+        "project_status",
         "rera_status",
         "is_active",
         "location",
@@ -46,6 +48,7 @@ class ProjectAdmin(admin.ModelAdmin):
                     "developer",
                     "location",
                     "project_type",
+                    "project_status",
                     "description",
                 )
             },

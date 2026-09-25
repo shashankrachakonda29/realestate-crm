@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}
+Site Visit | {{ site_visit.lead.name }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Site Visit Details
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Site Visit</h1>
+        <p>
+            {{ site_visit.lead.name }}
+            {% if site_visit.project %}
+                · {{ site_visit.project.name }}
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="form-actions">
+
+        {% if request.user.role != "VIEWER" %}
+            <a
+                href="{% url 'sitevisit_edit' site_visit.pk %}"
+                class="btn btn-primary"
+            >
+                Edit
+            </a>
+        {% endif %}
+
+        {% if request.user.role == "ADMIN" or request.user.role == "MANAGER" %}
+            <a
+                href="{% url 'sitevisit_delete' site_visit.pk %}"
+                class="btn btn-light"
+            >
+                Delete
+            </a>
+        {% endif %}
+
+        <a
+            href="{% url 'sitevisit_list' %}"
+            class="btn btn-light"
+        >
+            Back to Site Visits
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- VISIT INFORMATION -->
+
+<div class="card">
+
+    <h2>Visit Information</h2>
+
+    <div class="details-grid">
+
+        <div class="detail-item">
+
+            <span>Lead</span>
+
+            <strong>
+                <a href="{% url 'lead_detail' site_visit.lead.pk %}">
+                    {{ site_visit.lead.name }}
+                </a>
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Phone</span>
+
+            <strong>
+                {{ site_visit.lead.phone }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Project</span>
+
+            <strong>
+                {{ site_visit.project.name }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Assigned To</span>
+
+            <strong>
+
+                {% if site_visit.assigned_to %}
+                    {{ site_visit.assigned_to }}
+                {% else %}
+                    Unassigned
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Visit Date</span>
+
+            <strong>
+                {{ site_visit.visit_date|date:"d M Y" }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Visit Time</span>
+
+            <strong>
+                {{ site_visit.visit_time|time:"h:i A" }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Status</span>
+
+            <strong>
+                <span class="status-badge status-{{ site_visit.status|lower|cut:'_' }}">
+                    {{ site_visit.get_status_display }}
+                </span>
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Created</span>
+
+            <strong>
+                {{ site_visit.created_at|date:"d M Y, h:i A" }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>Last Updated</span>
+
+            <strong>
+                {{ site_visit.updated_at|date:"d M Y, h:i A" }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- NOTES -->
+
+<div class="card">
+
+    <h2>Visit Notes</h2>
+
+    <div class="text-content">
+
+        {% if site_visit.notes %}
+            {{ site_visit.notes|linebreaks }}
+        {% else %}
+            <span>No notes added.</span>
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- OUTCOME -->
+
+<div class="card">
+
+    <h2>Visit Outcome</h2>
+
+    <div class="text-content">
+
+        {% if site_visit.outcome %}
+            {{ site_visit.outcome|linebreaks }}
+        {% else %}
+            <span>No outcome recorded yet.</span>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <h2>Lead Status</h2>
+
+    <p>
+        Current lead status:
+        <strong>
+            {{ site_visit.lead.get_status_display }}
+        </strong>
+    </p>
+
+    <a
+        href="{% url 'lead_detail' site_visit.lead.pk %}"
+        class="btn btn-primary"
+    >
+        Update Lead Status
+    </a>
+
+</div>
+<!-- LEAD LINK -->
+
+<div class="card">
+
+    <h2>Lead</h2>
+
+    <p>
+        This site visit belongs to:
+
+        <strong>
+            {{ site_visit.lead.name }}
+        </strong>
+    </p>
+
+    <a
+        href="{% url 'lead_detail' site_visit.lead.pk %}"
+        class="btn btn-light"
+    >
+        View Lead
+    </a>
+
+</div>
+
+{% endblock %}

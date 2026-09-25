@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ title }} | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>{{ title }}</h1>
+        <p>Manage CRM user information and role.</p>
+    </div>
+
+    <a
+        href="{% url 'user_list' %}"
+        class="btn btn-light"
+    >
+        Back to Users
+    </a>
+
+</div>
+
+
+<div class="card form-card">
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <div class="form-grid">
+
+            {% for field in form %}
+
+                <div class="form-group">
+
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small>
+                            {{ field.help_text }}
+                        </small>
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <div class="field-error">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% if form.non_field_errors %}
+
+            <div class="field-error">
+                {{ form.non_field_errors }}
+            </div>
+
+        {% endif %}
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Save User
+            </button>
+
+            <a
+                href="{% url 'user_list' %}"
+                class="btn btn-light"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

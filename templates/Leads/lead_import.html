@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4 lead-import-page">
+
+    <!-- Page Header -->
+    <div class="lead-import-header">
+
+        <div>
+            <h2>Import Leads</h2>
+
+            <p class="text-muted">
+                Upload an Excel or CSV file to import leads.
+            </p>
+        </div>
+
+        <div class="lead-import-actions">
+
+            <a href="{% url 'lead_list' %}"
+               class="lead-import-back">
+                ← Back to Leads
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Error -->
+    {% if error %}
+
+        <div class="lead-import-error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <!-- Django Messages -->
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="lead-import-message {{ message.tags }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =========================================
+         UPLOAD CARD
+    ========================================== -->
+
+    <div class="lead-import-card">
+
+        <div class="lead-import-card-body">
+
+            <div class="lead-import-card-title">
+
+                <div>
+                    <h3>Upload Lead File</h3>
+
+                    <p>
+                        Select an Excel or CSV file from your computer.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <form method="post"
+                  enctype="multipart/form-data"
+                  class="lead-import-form">
+
+                {% csrf_token %}
+
+
+                <div class="lead-file-area">
+
+                    <label for="lead_file"
+                           class="lead-file-label">
+
+                        Excel / CSV File
+
+                    </label>
+
+
+                    <input
+                        type="file"
+                        name="lead_file"
+                        id="lead_file"
+                        class="lead-file-input"
+                        accept=".csv,.xlsx,.xls"
+                        required
+                    >
+
+
+                    <div class="lead-file-help">
+
+                        Supported formats:
+                        <strong>CSV, XLSX and XLS</strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="lead-import-form-actions">
+
+                    <a href="{% url 'lead_list' %}"
+                       class="lead-cancel-btn">
+                        Cancel
+                    </a>
+
+
+                    <button type="submit"
+                            class="lead-import-submit">
+
+                        Continue →
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         RECOMMENDED COLUMNS
+    ========================================== -->
+
+    <div class="lead-import-card">
+
+        <div class="lead-import-card-body">
+
+            <div class="lead-import-card-title">
+
+                <div>
+
+                    <h3>Recommended Columns</h3>
+
+                    <p>
+                        Your Excel/CSV file can contain the following columns.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="lead-columns-grid">
+
+
+                <!-- Column Group 1 -->
+
+                <div class="lead-column-group">
+
+                    <h4>Basic Information</h4>
+
+                    <ul class="lead-column-list">
+
+                        <li>Name</li>
+
+                        <li>Phone</li>
+
+                        <li>Email</li>
+
+                        <li>Source</li>
+
+                        <li>Status</li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- Column Group 2 -->
+
+                <div class="lead-column-group">
+
+                    <h4>Property Interest</h4>
+
+                    <ul class="lead-column-list">
+
+                        <li>Project</li>
+
+                        <li>Budget Min</li>
+
+                        <li>Budget Max</li>
+
+                        <li>Location</li>
+
+                        <li>Property Type</li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- Column Group 3 -->
+
+                <div class="lead-column-group">
+
+                    <h4>Lead Details</h4>
+
+                    <ul class="lead-column-list">
+
+                        <li>BHK</li>
+
+                        <li>Requirement</li>
+
+                        <li>Notes</li>
+
+                        <li>Next Follow Up</li>
+
+                        <li>Assigned To</li>
+
+                    </ul>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

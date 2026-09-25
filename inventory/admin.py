@@ -7,7 +7,6 @@ from .models import Inventory
 class InventoryAdmin(admin.ModelAdmin):
 
     list_display = (
-        "unit_number",
         "project",
         "property_type",
         "bhk",
@@ -27,7 +26,6 @@ class InventoryAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "unit_number",
         "project__name",
         "rera_number",
         "source",
@@ -35,7 +33,6 @@ class InventoryAdmin(admin.ModelAdmin):
 
     ordering = (
         "project",
-        "unit_number",
     )
 
     fieldsets = (
@@ -44,7 +41,6 @@ class InventoryAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "project",
-                    "unit_number",
                     "property_type",
                     "bhk",
                     "plot_size_sq_yards",

@@ -8,9 +8,14 @@ from .models import Lead, LeadActivity
 
 from accounts.permissions import require_roles
 
+from leads.services.lead_import import (
+    FIELD_DEFINITIONS,
+    detect_column_mapping,
+    import_leads,
+    read_lead_file,
+)
 
 User = get_user_model()
-
 
 # =====================================================
 # LEAD ACCESS HELPER
@@ -43,7 +48,178 @@ def can_assign_leads(user):
         ]
     )
 
+# =====================================================
+# LEAD IMPORT
+# =====================================================
 
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+)
+def lead_import(request):
+
+    if request.method == "POST" and not request.FILES and request.session.get("lead_import_rows"):
+        return lead_import_mapping(request)
+
+    # =================================================
+    # STEP 1 - UPLOAD FILE
+    # =================================================
+
+    if request.method == "GET":
+
+        return render(
+            request,
+            "Leads/lead_import.html",
+        )
+
+    uploaded_file = request.FILES.get("lead_file")
+
+    if not uploaded_file:
+
+        return render(
+            request,
+            "Leads/lead_import.html",
+            {
+                "error": "Please select an Excel or CSV file."
+            },
+        )
+
+    filename = uploaded_file.name.lower()
+
+    allowed_extensions = (
+        ".xlsx",
+        ".xls",
+        ".csv",
+    )
+
+    if not filename.endswith(allowed_extensions):
+
+        return render(
+            request,
+            "Leads/lead_import.html",
+            {
+                "error": (
+                    "Unsupported file type. "
+                    "Please upload CSV, XLSX or XLS."
+                )
+            },
+        )
+
+    try:
+        columns, rows = read_lead_file(uploaded_file)
+    except ValueError as exc:
+
+        return render(
+            request,
+            "Leads/lead_import.html",
+            {
+                "error": f"Unable to read file: {exc}"
+            },
+        )
+
+    # =================================================
+    # EMPTY FILE
+    # =================================================
+
+    if not rows:
+
+        return render(
+            request,
+            "Leads/lead_import.html",
+            {
+                "error": "The uploaded file is empty."
+            },
+        )
+
+    # =================================================
+    # NORMALIZE COLUMN NAMES
+    # =================================================
+
+    request.session["lead_import_rows"] = rows
+    request.session["lead_import_columns"] = columns
+
+    request.session["lead_import_filename"] = (
+        uploaded_file.name
+    )
+
+    request.session.modified = True
+
+    suggested_mapping = detect_column_mapping(columns)
+    lead_fields = [
+        {"name": name, "label": label, "required": required,
+         "suggested": suggested_mapping.get(name)}
+        for name, label, required in FIELD_DEFINITIONS
+    ]
+
+    return render(
+        request,
+        "Leads/import_mapping.html",
+        {
+            "columns": columns,
+            "row_count": len(rows),
+            "filename": uploaded_file.name,
+            "lead_fields": lead_fields,
+            "suggested_mapping": suggested_mapping,
+        },
+    )
+
+
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+)
+def lead_import_mapping(request):
+    rows = request.session.get("lead_import_rows")
+    columns = request.session.get("lead_import_columns", [])
+    filename = request.session.get("lead_import_filename", "")
+
+    if not rows or not columns:
+        return render(request, "Leads/lead_import.html", {
+            "error": "Please upload a file before mapping columns."
+        })
+
+    if request.method != "POST":
+        suggested_mapping = detect_column_mapping(columns)
+        lead_fields = [
+            {"name": name, "label": label, "required": required,
+             "suggested": suggested_mapping.get(name)}
+            for name, label, required in FIELD_DEFINITIONS
+        ]
+        return render(request, "Leads/import_mapping.html", {
+            "columns": columns, "row_count": len(rows), "filename": filename,
+            "lead_fields": lead_fields, "suggested_mapping": suggested_mapping,
+        })
+
+    mapping = {
+        name: request.POST.get(f"mapping_{name}", "").strip()
+        for name, _, _ in FIELD_DEFINITIONS
+    }
+    missing = [name.replace("_", " ").title() for name in ("name", "phone") if not mapping.get(name)]
+    selected_columns = [column for column in mapping.values() if column]
+    duplicate_columns = sorted({column for column in selected_columns if selected_columns.count(column) > 1})
+    if missing or duplicate_columns:
+        errors = []
+        if missing:
+            errors.append("Required columns must be mapped: " + ", ".join(missing) + ".")
+        if duplicate_columns:
+            errors.append("A source column cannot be mapped to multiple fields: " + ", ".join(duplicate_columns) + ".")
+        return render(request, "Leads/import_mapping.html", {
+            "columns": columns, "row_count": len(rows), "filename": filename,
+            "lead_fields": [
+                {"name": name, "label": label, "required": required,
+                 "selected": mapping.get(name, "")}
+                for name, label, required in FIELD_DEFINITIONS
+            ],
+            "error": " ".join(errors),
+        })
+
+    result = import_leads(rows, mapping)
+    request.session.pop("lead_import_rows", None)
+    request.session.pop("lead_import_columns", None)
+    request.session.pop("lead_import_filename", None)
+    return render(request, "Leads/import_result.html", result)
 # =====================================================
 # PIPELINE
 # =====================================================

@@ -1,8 +1,9 @@
 from django.shortcuts import get_object_or_404, redirect, render
-
+from django.db.models import Count, Min, Max
 from .models import Project
 from developers.models import Developer
 from locations.models import Location
+from inventory.models import Inventory
 
 
 def project_list(request):
@@ -58,6 +59,11 @@ def project_create(request):
             project_type=request.POST.get(
                 "project_type"
             ),
+            project_status=request.POST.get(
+                "project_status"    
+            ),
+
+            is_active=request.POST.get("is_active") == "on",
 
             description=request.POST.get(
                 "description", ""
@@ -106,25 +112,22 @@ def project_create(request):
             google_maps_url=request.POST.get(
                 "google_maps_url", ""
             ).strip(),
-
-            is_active=request.POST.get(
-                "is_active"
-            ) == "on",
         )
 
         return redirect("project_list")
 
     return render(
-    request,
-    "projects/form.html",
-    {
-        "title": "Add Project",
-        "project": None,
-        "developers": developers,
-        "locations": locations,
-        "project_types": Project.ProjectType.choices,
-    },
-)
+        request,
+        "projects/form.html",
+        {
+            "title": "Add Project",
+            "project": None,
+            "developers": developers,
+            "locations": locations,
+            "project_types": Project.ProjectType.choices,
+            "project_status": Project.ProjectStatus.choices,
+        },
+    )
 
 
 def project_detail(request, pk):
@@ -160,6 +163,7 @@ def project_edit(request, pk):
     locations = Location.objects.filter(
         is_active=True
     ).order_by("name")
+   
 
     if request.method == "POST":
 
@@ -177,6 +181,13 @@ def project_edit(request, pk):
 
         project.project_type = request.POST.get(
             "project_type"
+        )
+        project.project_status = request.POST.get(
+            "project_status"    
+        )
+
+        project.status = request.POST.get(
+            "status"
         )
 
         project.description = request.POST.get(
@@ -230,7 +241,6 @@ def project_edit(request, pk):
         project.google_maps_url = request.POST.get(
             "google_maps_url", ""
         ).strip()
-
         project.is_active = (
             request.POST.get("is_active") == "on"
         )
@@ -243,16 +253,17 @@ def project_edit(request, pk):
         )
 
     return render(
-    request,
-    "projects/form.html",
-    {
-        "title": "Edit Project",
-        "project": project,
-        "developers": developers,
-        "locations": locations,
-        "project_types": Project.ProjectType.choices,
-    },
-)
+        request,
+        "projects/form.html",
+        {
+            "title": "Edit Project",
+            "project": project,
+            "developers": developers,
+            "locations": locations,
+            "project_types": Project.ProjectType.choices,
+            "project_status": Project.ProjectStatus.choices,
+        },
+    )
 
 
 def project_delete(request, pk):
@@ -274,5 +285,89 @@ def project_delete(request, pk):
         {
             "project": project,
             "confirm_delete": True,
+        },
+    )
+
+
+def project_inventory(request, project_id):
+
+    project = get_object_or_404(
+        Project,
+        pk=project_id,
+    )
+
+    inventory = Inventory.objects.filter(
+        project=project,
+        status=Inventory.Status.AVAILABLE,
+    )
+
+    bhk_groups = (
+        inventory
+        .filter(bhk__isnull=False)
+        .values("bhk")
+        .annotate(
+            unit_count=Count("id"),
+            min_sft=Min("unit_size_sq_ft"),
+            max_sft=Max("unit_size_sq_ft"),
+            min_price=Min("current_price"),
+        )
+        .order_by("bhk")
+    )
+
+    # Add facings for each BHK
+    for item in bhk_groups:
+
+        item["facings"] = list(
+            inventory
+            .filter(
+                bhk=item["bhk"],
+                facing__isnull=False,
+            )
+            .exclude(
+                facing=""
+            )
+            .values_list(
+                "facing",
+                flat=True,
+            )
+            .distinct()
+        )
+
+    return render(
+        request,
+        "developers/dev_project_inventory.html",
+        {
+            "project": project,
+            "bhk_groups": bhk_groups,
+        },
+    )
+
+def project_inventory_bhk(request, project_id, bhk):
+
+    project = get_object_or_404(
+        Project.objects.select_related(
+            "developer",
+            "location",
+        ),
+        pk=project_id,
+    )
+
+    inventory = (
+        Inventory.objects
+        .filter(
+            project=project,
+            bhk=bhk,
+            status=Inventory.Status.AVAILABLE,
+        )
+        .order_by("current_price")
+    )
+
+    return render(
+        request,
+        "developers/dev_project_inventory_bhk.html",
+        {
+            "project": project,
+            "bhk": bhk,
+            "inventory": inventory,
         },
     )

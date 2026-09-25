@@ -6,6 +6,8 @@ from .views import (
     project_detail,
     project_edit,
     project_list,
+    project_inventory,
+    project_inventory_bhk,
 )
 
 
@@ -39,5 +41,16 @@ urlpatterns = [
         "<int:pk>/delete/",
         project_delete,
         name="project_delete",
+    ),
+    path(
+        "<int:project_id>/inventory/",
+        project_inventory,
+        name="project_inventory",
+    ),
+
+    path(
+        "<int:project_id>/inventory/<str:bhk>/",
+        project_inventory_bhk,
+        name="project_inventory_bhk",
     ),
 ]

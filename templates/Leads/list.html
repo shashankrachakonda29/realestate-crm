@@ -16,13 +16,16 @@ Leads
         <h1>Leads</h1>
         <p>Track prospects, follow-ups, and conversion momentum.</p>
     </div>
-
-    {% if request.user.role != "VIEWER" %}
-        <a href="{% url 'lead_create' %}" class="btn btn-primary">
-            <span aria-hidden="true">+</span> Add Lead
-        </a>
-    {% endif %}
-
+    <div>
+        {% if request.user.role != "VIEWER" %}
+            <a href="{% url 'lead_create' %}" class="btn btn-primary">
+                <span aria-hidden="true">+</span> Add Lead
+            </a>
+            <a href="{% url 'lead_import' %}" class="btn btn-light">
+                Import Leads
+            </a>
+        {% endif %}
+    </div>
 </div>
 
 

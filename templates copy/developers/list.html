@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}
+Developers | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Developers
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Developers</h1>
+        <p>Manage property developers.</p>
+    </div>
+
+    <a href="{% url 'developer_create' %}"
+       class="btn btn-primary">
+        + Add Developer
+    </a>
+
+</div>
+
+
+<div class="card">
+
+    <form method="get"
+          class="search-bar">
+
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="Search developers..."
+        >
+
+        <button
+            type="submit"
+            class="btn btn-secondary">
+            Search
+        </button>
+
+        {% if search %}
+            <a
+                href="{% url 'developer_list' %}"
+                class="btn btn-light">
+                Clear
+            </a>
+        {% endif %}
+
+    </form>
+
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Developer</th>
+                    <th>Contact Person</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for developer in developers %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ developer.name }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        {{ developer.contact_person|default:"—" }}
+                    </td>
+
+                    <td>
+                        {{ developer.phone|default:"—" }}
+                    </td>
+
+                    <td>
+                        {{ developer.email|default:"—" }}
+                    </td>
+
+                    <td>
+
+                        {% if developer.is_active %}
+                            <span class="badge badge-active">
+                                Active
+                            </span>
+                        {% else %}
+                            <span class="badge badge-inactive">
+                                Inactive
+                            </span>
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <div class="actions">
+
+                            <a
+                                href="{% url 'developer_detail' developer.pk %}"
+                                class="btn btn-light">
+                                View
+                            </a>
+
+                            <a
+                                href="{% url 'developer_edit' developer.pk %}"
+                                class="btn btn-light">
+                                Edit
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        class="empty-state">
+
+                        No developers found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,299 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}Property CRM{% endblock %}
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar" id="sidebar">
+
+            <!-- Logo -->
+            <div class="logo">
+
+                <div class="logo-mark" aria-hidden="true">
+                    <span>⌂</span>
+                </div>
+
+                <div class="logo-text">
+                    <strong>Property CRM</strong>
+                    <small>Real Estate Management</small>
+                </div>
+
+            </div>
+
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+
+                <div class="nav-section-title">Workspace</div>
+
+
+                <!-- Dashboard -->
+
+                <a href="{% url 'dashboard' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+
+                    <span class="nav-icon">▦</span>
+
+                    <span class="nav-text">
+                        Dashboard
+                    </span>
+
+                </a>
+
+
+                <div class="nav-section-title">Property</div>
+
+
+                <!-- Developers -->
+
+                <a href="{% url 'developer_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'developer_list' %}active{% endif %}">
+
+                    <span class="nav-icon">▥</span>
+
+                    <span class="nav-text">
+                        Developers
+                    </span>
+
+                </a>
+
+
+                <!-- Locations -->
+
+                <a href="{% url 'location_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'location_list' %}active{% endif %}">
+
+                    <span class="nav-icon">⌖</span>
+
+                    <span class="nav-text">
+                        Locations
+                    </span>
+
+                </a>
+
+
+                <!-- Projects -->
+
+                <a href="{% url 'project_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}">
+
+                    <span class="nav-icon">◇</span>
+
+                    <span class="nav-text">
+                        Projects
+                    </span>
+
+                </a>
+
+
+                <!-- Inventory -->
+
+                <a href="{% url 'inventory_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'inventory_list' %}active{% endif %}">
+
+                    <span class="nav-icon">□</span>
+
+                    <span class="nav-text">
+                        Inventory
+                    </span>
+
+                </a>
+
+
+                <div class="nav-section-title">Customer Relations</div>
+
+
+                <!-- Leads -->
+
+                <a href="{% url 'lead_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'lead_list' or request.resolver_match.url_name == 'lead_detail' or request.resolver_match.url_name == 'lead_create' or request.resolver_match.url_name == 'lead_edit' or request.resolver_match.url_name == 'lead_pipeline' %}active{% endif %}">
+                    <span class="nav-icon">◎</span>
+                    Leads
+                </a>
+
+                <a href="{% url 'sitevisit_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'sitevisit_list' or request.resolver_match.url_name == 'sitevisit_detail' or request.resolver_match.url_name == 'sitevisit_create' or request.resolver_match.url_name == 'sitevisit_edit' %}active{% endif %}">
+                    <span class="nav-icon">◷</span>
+                    <span class="nav-text">Site Visits</span>
+                </a>
+
+                <a href="{% url 'user_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_edit' or request.resolver_match.url_name == 'user_password' %}active{% endif %}">
+                    <span class="nav-icon">◌</span>
+                    <span class="nav-text">Team</span>
+                </a>
+
+            </nav>
+
+
+            <!-- Sidebar Bottom -->
+
+            <div class="sidebar-bottom">
+
+                <a href="#" class="nav-item">
+
+                    <span class="nav-icon">↗</span>
+
+                    <span class="nav-text">
+                        Settings
+                    </span>
+
+                </a>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================= MAIN ================= -->
+
+        <main class="main">
+
+
+            <!-- ================= TOPBAR ================= -->
+
+            <header class="topbar">
+
+                <!-- Mobile Menu -->
+
+                <button class="mobile-menu-button" type="button" onclick="toggleSidebar()" aria-label="Open navigation" aria-controls="sidebar">
+                    <span></span><span></span><span></span>
+                </button>
+
+
+                <!-- Page Heading -->
+
+                <div class="page-heading">
+
+                    <div class="page-title">
+
+                        {% block page_heading %}
+                        Dashboard
+                        {% endblock %}
+
+                    </div>
+
+                    <div class="breadcrumb">
+
+                        Property CRM
+
+                        {% block breadcrumb %}
+                        {% endblock %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- Topbar Right -->
+
+                <div class="topbar-right">
+
+
+                    <!-- Notifications -->
+
+                    <button class="icon-button" type="button" title="Notifications" aria-label="Notifications">
+                        <span class="bell-icon">◔</span>
+                    </button>
+
+
+                    <!-- User -->
+
+                    <div class="user-menu">
+
+                        <div class="avatar">
+                            {% if request.user.is_authenticated %}
+                                {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                            {% else %}
+                                ?
+                            {% endif %}
+                        </div>
+
+                        <div class="user-info">
+
+                            <strong>
+                                {% if request.user.is_authenticated %}
+                                    {{ request.user.get_full_name|default:request.user.username }}
+                                {% else %}
+                                    Guest
+                                {% endif %}
+                            </strong>
+
+                            <span>
+                                {% if request.user.is_authenticated %}
+                                    {{ request.user.get_role_display|default:"User" }}
+                                {% endif %}
+                            </span>
+
+                        </div>
+
+                        {% if request.user.is_authenticated %}
+                            <a class="logout-link" href="{% url 'logout' %}">Logout</a>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- ================= CONTENT ================= -->
+
+            <section class="content">
+
+                {% if messages %}
+                    <div class="flash-stack" aria-live="polite">
+                        {% for message in messages %}
+                            <div class="flash flash-{{ message.tags|default:'info' }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}
+
+                {% endblock %}
+
+            </section>
+
+
+        </main>
+
+    </div>
+
+
+    <!-- Mobile Sidebar Overlay -->
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()">
+    </div>
+
+
+    <script src="{% static 'js/app.js' %}"></script>
+
+
+    {% block extra_js %}
+    {% endblock %}
+
+</body>
+
+</html>

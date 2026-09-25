@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}
+Developers | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Developers
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Developers</h1>
+        <p>Manage property developers and their project portfolio.</p>
+    </div>
+
+    <a href="{% url 'developer_create' %}" class="btn btn-primary">
+        + Add Developer
+    </a>
+
+</div>
+
+
+<!-- Search -->
+<div class="developer-search-card">
+
+    <form method="get" class="developer-search-form">
+
+        <div class="developer-search-input">
+
+            <span class="search-icon">⌕</span>
+
+            <input type="text" name="search" value="{{ search }}" placeholder="Search developers...">
+
+        </div>
+
+        <button type="submit" class="developer-search-btn">
+            Search
+        </button>
+
+        {% if search %}
+        <a href="{% url 'developer_list' %}" class="developer-clear-btn">
+            Clear
+        </a>
+        {% endif %}
+
+    </form>
+
+</div>
+
+
+<!-- Developer Cards -->
+
+<div class="developer-grid">
+
+    {% for developer in developers %}
+
+    <div class="developer-card">
+
+        <!-- =================================
+             HEADER
+        ================================== -->
+
+        <div class="developer-header">
+
+            <div class="developer-avatar">
+                {{ developer.name|slice:":2"|upper }}
+            </div>
+
+
+            <div class="developer-heading">
+
+                <h2>
+                    {{ developer.name }}
+                </h2>
+
+                <p class="developer-subtitle">
+                    Property Developer
+                </p>
+
+
+                {% if developer.is_active %}
+
+                <span class="developer-status active">
+                    <span class="status-dot"></span>
+                    Active
+                </span>
+
+                {% else %}
+
+                <span class="developer-status inactive">
+                    <span class="status-dot"></span>
+                    Inactive
+                </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <a href="{% url 'developer_detail' developer.pk %}" class="developer-menu" title="View developer">
+                ⋮
+            </a>
+            <!-- Location & Since -->
+
+            <div class="developer-meta">
+
+                {% if developer.location %}
+                <span class="developer-meta-item">
+                    <span class="meta-icon">⌖</span>
+                    {{ developer.location }}
+                </span>
+                {% endif %}
+
+                {% if developer.established_year %}
+                <span class="meta-separator">|</span>
+
+                <span class="developer-meta-item">
+                    <span class="meta-icon">▣</span>
+                    Since {{ developer.established_year }}
+                </span>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================
+             PROJECT SUMMARY
+        ================================== -->
+
+        <div class="developer-summary">
+
+            <div class="summary-icon">
+                <span>▦</span>
+            </div>
+
+
+            <div class="summary-main">
+
+                <span class="summary-title">
+                    TOTAL PROJECTS
+                </span>
+
+                <strong>
+                    {{ developer.project_count }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-status">
+
+                {% if developer.is_active %}
+
+                <span class="summary-status-title">
+                    Active Developer
+                </span>
+
+                <span class="summary-status-text">
+                    Growing Portfolio
+                </span>
+
+                {% else %}
+
+                <span class="summary-status-title">
+                    Inactive Developer
+                </span>
+
+                <span class="summary-status-text">
+                    Portfolio
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================
+             PROPERTY TYPES
+        ================================== -->
+
+        <div class="property-type-grid">
+
+
+            <!-- Villas -->
+
+            <div class="property-type-card villa">
+                <a href="{% url 'developer_projects' developer.id %}?property_type=VILLA" class="developer-stat-card">
+                    <div class="property-type-icon">
+                        ⌂
+                    </div>
+
+                    <div class="property-type-name">
+                        Villas
+                    </div>
+
+                    <strong>
+                        {{ developer.villa_count }}
+                    </strong>
+                </a>
+
+
+
+            </div>
+
+
+            <!-- Apartments -->
+
+            <div class="property-type-card apartment">
+                <a href="{% url 'developer_projects' developer.id %}?property_type=APARTMENT" class="developer-stat-card">
+                <div class="property-type-icon">
+                    ▥
+                </div>
+
+                <div class="property-type-name">
+                    Apartments
+                </div>
+
+                <strong>
+                    {{ developer.apartment_count }}
+                </strong>
+                </a>
+
+            </div>
+
+
+            <!-- Plots -->
+
+            <div class="property-type-card plot">
+                <a href="{% url 'developer_projects' developer.id %}?property_type=PLOT" class="developer-stat-card">
+
+                    <div class="property-type-icon">
+                        ◈
+                    </div>
+
+                    <div class="property-type-name">
+                        Plots
+                    </div>
+
+                    <strong>
+                        {{ developer.plot_count }}
+                    </strong>
+                </a>
+            </div>
+
+
+            <!-- Commercial -->
+
+            <div class="property-type-card commercial">
+                <a href="{% url 'developer_projects' developer.id %}?property_type=COMMERCIAL" class="developer-stat-card">
+
+                <div class="property-type-icon">
+                    ▤
+                </div>
+
+                <div class="property-type-name">
+                    Commercial
+                </div>
+
+                <strong>
+                    {{ developer.commercial_count }}
+                </strong>
+                </a>
+            </div>
+
+        </div>
+
+
+        <!-- =================================
+             CONTACT INFORMATION
+        ================================== -->
+
+        <div class="developer-contact">
+
+
+            <!-- Contact Person -->
+
+            <div class="contact-row">
+
+                <div class="contact-icon person">
+                    ♙
+                </div>
+
+                <div class="contact-content">
+
+                    <span>
+                        CONTACT PERSON
+                    </span>
+
+                    <strong>
+                        {{ developer.contact_person|default:"—" }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- Phone -->
+
+            <div class="contact-row">
+
+                <div class="contact-icon phone">
+                    ☎
+                </div>
+
+                <div class="contact-content">
+
+                    <span>
+                        PHONE
+                    </span>
+
+                    {% if developer.phone %}
+
+                    <a href="tel:{{ developer.phone }}">
+                        {{ developer.phone }}
+                    </a>
+
+                    {% else %}
+
+                    <strong>—</strong>
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if developer.phone %}
+
+                <a href="tel:{{ developer.phone }}" class="contact-action" title="Call">
+                    ☎
+                </a>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Email -->
+
+            <div class="contact-row">
+
+                <div class="contact-icon email">
+                    ✉
+                </div>
+
+                <div class="contact-content">
+
+                    <span>
+                        EMAIL
+                    </span>
+
+                    {% if developer.email %}
+
+                    <a href="mailto:{{ developer.email }}">
+                        {{ developer.email }}
+                    </a>
+
+                    {% else %}
+
+                    <strong>—</strong>
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if developer.email %}
+
+                <a href="mailto:{{ developer.email }}" class="contact-action" title="Email">
+                    ✉
+                </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================
+             ACTIONS
+        ================================== -->
+
+        <div class="developer-actions">
+
+            <a href="{% url 'developer_projects' developer.id %}?property_type=ALL" class="developer-view-btn">
+                <span>▣</span>
+                All Projects
+            </a>
+
+            <a href="{% url 'developer_edit' developer.pk %}" class="developer-edit-btn">
+                <span>✎</span>
+                Edit
+            </a>
+
+        </div>
+
+    </div>
+
+
+    {% empty %}
+
+
+    <!-- =================================
+         EMPTY STATE
+    ================================== -->
+
+    <div class="developer-empty">
+
+        <div class="empty-icon">
+            +
+        </div>
+
+        <h2>
+            No Developers Found
+        </h2>
+
+        <p>
+            Add your first property developer to start managing projects.
+        </p>
+
+        <a href="{% url 'developer_create' %}" class="btn btn-primary">
+            + Add Developer
+        </a>
+
+    </div>
+
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
