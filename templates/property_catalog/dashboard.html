@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Property Catalog | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Property Catalog
+{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/property_catalog.css' %}">
+
+<div class="catalog-page">
+
+    <div class="catalog-header">
+        <div>
+            <span class="catalog-eyebrow">PROPERTY DATA</span>
+            <h1>Property Catalog</h1>
+            <p>Import and manage complete property information from a single data source.</p>
+        </div>
+
+        <div class="catalog-header-actions">
+            <a href="{% url 'property_catalog:import_json' %}" class="catalog-btn catalog-btn-primary">
+                Import JSON
+            </a>
+        </div>
+    </div>
+
+    <div class="catalog-card catalog-import-card">
+        <div class="catalog-card-header">
+            <div class="catalog-icon">↑</div>
+            <div>
+                <span class="catalog-eyebrow">BULK IMPORT</span>
+                <h2>Import Property Data</h2>
+                <p>Import multiple developers, projects, locations and configurations from one JSON file.</p>
+            </div>
+        </div>
+
+        <div class="catalog-flow">
+            <div class="catalog-flow-item">
+                <span>01</span>
+                <div>
+                    <strong>Upload</strong>
+                    <small>Choose JSON file</small>
+                </div>
+            </div>
+            <div class="catalog-flow-line"></div>
+            <div class="catalog-flow-item">
+                <span>02</span>
+                <div>
+                    <strong>Validate</strong>
+                    <small>Check data structure</small>
+                </div>
+            </div>
+            <div class="catalog-flow-line"></div>
+            <div class="catalog-flow-item">
+                <span>03</span>
+                <div>
+                    <strong>Preview</strong>
+                    <small>Review information</small>
+                </div>
+            </div>
+            <div class="catalog-flow-line"></div>
+            <div class="catalog-flow-item">
+                <span>04</span>
+                <div>
+                    <strong>Import</strong>
+                    <small>Add to CRM</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="catalog-card-footer">
+            <a href="{% url 'property_catalog:import_json' %}" class="catalog-btn catalog-btn-primary">
+                Import JSON
+            </a>
+        </div>
+    </div>
+
+    <div class="catalog-card">
+        <div class="catalog-card-header">
+            <div>
+                <span class="catalog-eyebrow">CATALOGS</span>
+                <h2>Imported Catalogs</h2>
+                <p>All recently imported property catalog snapshots are listed below.</p>
+            </div>
+        </div>
+
+        {% if catalogs %}
+            <div class="catalog-list">
+                {% for catalog in catalogs %}
+                    <div class="catalog-list-item">
+                        <div>
+                            <span class="catalog-eyebrow">CATALOG</span>
+                            <h3>{{ catalog.name }}</h3>
+                            <p>Version {{ catalog.version }} · {{ catalog.developers.count }} developers</p>
+                        </div>
+
+                        <div class="catalog-list-meta">
+                            <span>{{ catalog.created_at|date:"M d, Y" }}</span>
+                            <a href="{% url 'property_catalog:catalog_detail' catalog.pk %}" class="catalog-btn catalog-btn-light">
+                                Open
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="catalog-empty-state">
+                No catalogs have been imported yet.
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="catalog-card">
+        <div class="catalog-card-header">
+            <div>
+                <span class="catalog-eyebrow">DATA STRUCTURE</span>
+                <h2>Property Information</h2>
+                <p>A single JSON file can contain the complete property hierarchy.</p>
+            </div>
+        </div>
+
+        <div class="catalog-hierarchy">
+            <div class="catalog-level">
+                <div class="catalog-level-number">01</div>
+                <div>
+                    <strong>Developer</strong>
+                    <span>Builder and developer information</span>
+                </div>
+            </div>
+            <div class="catalog-connector"></div>
+            <div class="catalog-level">
+                <div class="catalog-level-number">02</div>
+                <div>
+                    <strong>Project</strong>
+                    <span>Project details, status and pricing</span>
+                </div>
+            </div>
+            <div class="catalog-connector"></div>
+            <div class="catalog-level">
+                <div class="catalog-level-number">03</div>
+                <div>
+                    <strong>Location</strong>
+                    <span>Locality, city and connectivity</span>
+                </div>
+            </div>
+            <div class="catalog-connector"></div>
+            <div class="catalog-level">
+                <div class="catalog-level-number">04</div>
+                <div>
+                    <strong>Configurations</strong>
+                    <span>Apartment, Villa, Plot and Commercial</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

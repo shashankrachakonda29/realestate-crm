@@ -74,6 +74,18 @@ class Project(models.Model):
         null=True,
         blank=True
     )
+    starting_price = models.CharField(
+        max_length=15,
+        # decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    price_per_sqft = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
 
     bhk = models.CharField(
         max_length=100,

@@ -1,0 +1,319 @@
+{
+  "catalog_name": "Hyderabad Property Catalog",
+  "version": "1.0",
+  "developers": [
+    {
+      "name": "Sunrise Realty Developers",
+      "developer_type": "Builder",
+      "contact_person": "Ravi Kumar",
+      "phone": "9876501234",
+      "email": "sales@example.com",
+      "website": "https://example.com",
+      "projects": [
+        {
+          "name": "Sunrise Green Villas",
+          "project_type": "VILLAS",
+          "project_details": {
+            "status": "UNDER_CONSTRUCTION",
+            "total_land_area": 25,
+            "total_towers": 0,
+            "total_floors": 2,
+            "total_units": 120,
+            "starting_price": 18000000,
+            "price_per_sqft": 7500
+          },
+          "location": {
+            "locality": "Mokila",
+            "city": "Hyderabad",
+            "district": "Rangareddy",
+            "state": "Telangana",
+            "pincode": "501203",
+            "google_maps_url": "https://maps.google.com/"
+          },
+          "highlights": [
+            "Gated community",
+            "Clubhouse",
+            "Landscaped gardens",
+            "24-hour security"
+          ],
+          "amenities": [
+            "Swimming pool",
+            "Gym",
+            "Children's play area",
+            "Indoor games"
+          ],
+          "configurations": [
+            {
+              "property_type": "VILLA",
+              "type_name": "3 BHK Villa",
+              "description": "Three-bedroom villa with private garden",
+              "bhk": "3 BHK",
+              "bedrooms": 3,
+              "bathrooms": 3,
+              "balconies": 2,
+              "built_up_area_sq_ft": 2400,
+              "carpet_area_sq_ft": 1900,
+              "super_built_up_area_sq_ft": 2500,
+              "plot_area_sq_yd": 200,
+              "plot_area_sq_ft": 1800,
+              "road_width_ft": 40,
+              "floor": "Ground + 1",
+              "office_area_sq_ft": null,
+              "retail_area_sq_ft": null,
+              "frontage_ft": null,
+              "suitable_for": "Residential",
+              "facing": "East",
+              "parking": "Covered parking",
+              "parking_count": 2,
+              "basic_price": 18000000,
+              "price_per_sqft": 7500,
+              "price_per_sqyd": null,
+              "maintenance_charges": 5000,
+              "availability": "AVAILABLE",
+              "possession": "2027-12-31",
+              "amenities": [
+                "Private garden",
+                "Covered parking"
+              ],
+              "features": [
+                "Premium flooring",
+                "Spacious living room"
+              ],
+              "notes": "Sample 3 BHK villa configuration"
+            },
+            {
+              "property_type": "VILLA",
+              "type_name": "4 BHK Villa",
+              "description": "Premium four-bedroom villa",
+              "bhk": "4 BHK",
+              "bedrooms": 4,
+              "bathrooms": 4,
+              "balconies": 3,
+              "built_up_area_sq_ft": 3200,
+              "carpet_area_sq_ft": 2600,
+              "super_built_up_area_sq_ft": 3300,
+              "plot_area_sq_yd": 300,
+              "plot_area_sq_ft": 2700,
+              "road_width_ft": 40,
+              "floor": "Ground + 1",
+              "office_area_sq_ft": null,
+              "retail_area_sq_ft": null,
+              "frontage_ft": null,
+              "suitable_for": "Residential",
+              "facing": "North",
+              "parking": "Covered parking",
+              "parking_count": 2,
+              "basic_price": 25000000,
+              "price_per_sqft": 7812.5,
+              "price_per_sqyd": null,
+              "maintenance_charges": 6000,
+              "availability": "AVAILABLE",
+              "possession": "2027-12-31",
+              "amenities": [
+                "Private garden",
+                "Terrace"
+              ],
+              "features": [
+                "Premium fittings",
+                "Large living area"
+              ],
+              "notes": "Sample 4 BHK villa configuration"
+            }
+          ],
+          "channel_partner_notes": "Sample villa project for testing"
+        },
+        {
+          "name": "Sunrise Heights Apartments",
+          "project_type": "APARTMENTS",
+          "project_details": {
+            "status": "READY_TO_MOVE",
+            "total_land_area": 8,
+            "total_towers": 3,
+            "total_floors": 15,
+            "total_units": 240,
+            "starting_price": 8500000,
+            "price_per_sqft": 6500
+          },
+          "location": {
+            "locality": "Kollur",
+            "city": "Hyderabad",
+            "district": "Rangareddy",
+            "state": "Telangana",
+            "pincode": "502300",
+            "google_maps_url": "https://maps.google.com/"
+          },
+          "highlights": [
+            "Three residential towers",
+            "Family-friendly community",
+            "Good road connectivity"
+          ],
+          "amenities": [
+            "Gym",
+            "Swimming pool",
+            "Power backup"
+          ],
+          "configurations": [
+            {
+              "property_type": "APARTMENT",
+              "type_name": "2 BHK Apartment",
+              "description": "Two-bedroom apartment",
+              "bhk": "2 BHK",
+              "bedrooms": 2,
+              "bathrooms": 2,
+              "balconies": 1,
+              "built_up_area_sq_ft": 1300,
+              "carpet_area_sq_ft": 1000,
+              "super_built_up_area_sq_ft": 1300,
+              "plot_area_sq_yd": null,
+              "plot_area_sq_ft": null,
+              "road_width_ft": null,
+              "floor": "5",
+              "office_area_sq_ft": null,
+              "retail_area_sq_ft": null,
+              "frontage_ft": null,
+              "suitable_for": "Residential",
+              "facing": "East",
+              "parking": "Covered parking",
+              "parking_count": 1,
+              "basic_price": 8500000,
+              "price_per_sqft": 6500,
+              "price_per_sqyd": null,
+              "maintenance_charges": 3000,
+              "availability": "AVAILABLE",
+              "possession": "2026-12-31",
+              "amenities": [
+                "Balcony",
+                "Covered parking"
+              ],
+              "features": [
+                "Two bathrooms",
+                "Living and dining area"
+              ],
+              "notes": "Sample 2 BHK apartment"
+            },
+            {
+              "property_type": "APARTMENT",
+              "type_name": "3 BHK Apartment",
+              "description": "Three-bedroom apartment",
+              "bhk": "3 BHK",
+              "bedrooms": 3,
+              "bathrooms": 3,
+              "balconies": 2,
+              "built_up_area_sq_ft": 1800,
+              "carpet_area_sq_ft": 1400,
+              "super_built_up_area_sq_ft": 1800,
+              "plot_area_sq_yd": null,
+              "plot_area_sq_ft": null,
+              "road_width_ft": null,
+              "floor": "8",
+              "office_area_sq_ft": null,
+              "retail_area_sq_ft": null,
+              "frontage_ft": null,
+              "suitable_for": "Residential",
+              "facing": "North",
+              "parking": "Covered parking",
+              "parking_count": 2,
+              "basic_price": 12000000,
+              "price_per_sqft": 6666.67,
+              "price_per_sqyd": null,
+              "maintenance_charges": 4000,
+              "availability": "AVAILABLE",
+              "possession": "2026-12-31",
+              "amenities": [
+                "Balcony",
+                "Covered parking"
+              ],
+              "features": [
+                "Three bathrooms",
+                "Spacious kitchen"
+              ],
+              "notes": "Sample 3 BHK apartment"
+            }
+          ],
+          "channel_partner_notes": "Sample apartment project for testing"
+        }
+      ]
+    },
+    {
+      "name": "Greenfield Properties",
+      "developer_type": "Developer",
+      "contact_person": "Suresh Reddy",
+      "phone": "9876505678",
+      "email": "info@example.com",
+      "website": "https://example.org",
+      "projects": [
+        {
+          "name": "Greenfield Open Plots",
+          "project_type": "PLOTS",
+          "project_details": {
+            "status": "AVAILABLE",
+            "total_land_area": 15,
+            "total_towers": 0,
+            "total_floors": 0,
+            "total_units": 100,
+            "starting_price": 3500000,
+            "price_per_sqft": 4000
+          },
+          "location": {
+            "locality": "Shankarpally",
+            "city": "Hyderabad",
+            "district": "Rangareddy",
+            "state": "Telangana",
+            "pincode": "501203",
+            "google_maps_url": "https://maps.google.com/"
+          },
+          "highlights": [
+            "Residential plot layout",
+            "Road access",
+            "Street lighting"
+          ],
+          "amenities": [
+            "Water connection",
+            "Park",
+            "Street lighting"
+          ],
+          "configurations": [
+            {
+              "property_type": "PLOT",
+              "type_name": "200 Square Yard Plot",
+              "description": "Residential open plot",
+              "bhk": "",
+              "bedrooms": null,
+              "bathrooms": null,
+              "balconies": null,
+              "built_up_area_sq_ft": null,
+              "carpet_area_sq_ft": null,
+              "super_built_up_area_sq_ft": null,
+              "plot_area_sq_yd": 200,
+              "plot_area_sq_ft": 1800,
+              "road_width_ft": 30,
+              "floor": "",
+              "office_area_sq_ft": null,
+              "retail_area_sq_ft": null,
+              "frontage_ft": 40,
+              "suitable_for": "Residential construction",
+              "facing": "East",
+              "parking": "",
+              "parking_count": null,
+              "basic_price": 3500000,
+              "price_per_sqft": null,
+              "price_per_sqyd": 17500,
+              "maintenance_charges": 0,
+              "availability": "AVAILABLE",
+              "possession": "2026-12-31",
+              "amenities": [
+                "Road access",
+                "Street lighting"
+              ],
+              "features": [
+                "Residential layout"
+              ],
+              "notes": "Sample open plot configuration"
+            }
+          ],
+          "channel_partner_notes": "Sample plot project for testing"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Property Catalog | Property CRM
+{% endblock %}
+
+{% block page_heading %}
+Property Catalog
+{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/property_catalog.css' %}">
+
+<div class="catalog-page">
+
+    <div class="catalog-header">
+        <div>
+            <span class="catalog-eyebrow">PROPERTY DATA</span>
+            <h1>Property Catalog</h1>
+            <p>Import and manage complete property information from a single data source.</p>
+        </div>
+    </div>
+
+    <div class="catalog-card upload-card">
+
+        <div class="catalog-card-header">
+            <div class="upload-icon">↑</div>
+            <div>
+                <span class="catalog-eyebrow">BULK IMPORT</span>
+                <h2>Import Property Data</h2>
+                <p>Upload a JSON file containing developers, projects, locations and configurations.</p>
+            </div>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="catalog-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="catalog-upload-form">
+            {% csrf_token %}
+
+            <label for="{{ form.json_file.id_for_label }}" class="upload-dropzone" aria-label="Upload property catalog JSON file">
+                <div class="upload-drop-icon">↑</div>
+                <strong>Choose JSON file</strong>
+                <small>Max file size is limited by the server configuration</small>
+            </label>
+
+            {{ form.json_file }}
+
+            <div class="selected-file">
+                <span>Selected file:</span>
+                <strong id="selected-file-name">No file selected</strong>
+            </div>
+
+            {% if form.json_file.errors %}
+                <div class="catalog-error">
+                    {{ form.json_file.errors }}
+                </div>
+            {% endif %}
+
+            <div class="catalog-card-footer">
+                <a href="{% url 'property_catalog:dashboard' %}" class="catalog-btn catalog-btn-light">Cancel</a>
+                <button type="submit" class="catalog-btn catalog-btn-primary">Validate & Preview</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="catalog-card">
+        <div class="catalog-card-header">
+            <div>
+                <span class="catalog-eyebrow">SUPPORTED DATA</span>
+                <h2>Expected JSON Structure</h2>
+                <p>A valid import includes developer records, project entries and property configurations.</p>
+            </div>
+        </div>
+
+        <div class="supported-grid">
+            <div class="supported-item">
+                <strong>Developer</strong>
+                <span>Name, contact details and project list</span>
+            </div>
+            <div class="supported-item">
+                <strong>Project</strong>
+                <span>Status, pricing, highlights and amenities</span>
+            </div>
+            <div class="supported-item">
+                <strong>Location</strong>
+                <span>Locality, city, map URL and pincode</span>
+            </div>
+            <div class="supported-item">
+                <strong>Configurations</strong>
+                <span>Apartment, villa, plot and commercial units</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('{{ form.json_file.id_for_label }}');
+        const label = document.getElementById('selected-file-name');
+        if (!input || !label) return;
+
+        input.addEventListener('change', function () {
+            const file = input.files && input.files[0];
+            label.textContent = file ? file.name : 'No file selected';
+        });
+    });
+</script>
+
+{% endblock %}

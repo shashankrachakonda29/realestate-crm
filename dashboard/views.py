@@ -7,8 +7,11 @@ from inventory.models import Inventory
 from leads.models import Lead
 from sitevisits.models import SiteVisit
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+
 
 User = get_user_model()
+@login_required
 def dashboard(request):
 
     total_developers = Developer.objects.filter(

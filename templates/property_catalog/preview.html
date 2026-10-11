@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Review Property Catalog | Property CRM{% endblock %}
+{% block page_heading %}Catalog Preview{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/property_catalog.css' %}">
+
+<div class="catalog-page pc-preview-page">
+    <header class="pc-preview-header">
+        <a href="{% url 'property_catalog:import_json' %}" class="catalog-back">
+            <span aria-hidden="true">←</span> Back to Import
+        </a>
+        <span class="catalog-eyebrow">PROPERTY CATALOG / PREVIEW</span>
+        <h1>Review your property data</h1>
+        <p>Check the developers, projects and configurations before adding them to your catalog.</p>
+    </header>
+
+    {% if import_error %}
+    <div class="catalog-card pc-preview-error" role="alert">
+        <strong>Import failed</strong>
+        <p>{{ import_error }}</p>
+    </div>
+    {% endif %}
+
+    <section class="pc-preview-summary" aria-label="Import summary">
+        <article class="catalog-card pc-summary-card">
+            <span>Developers</span>
+            <strong>{{ developer_count }}</strong>
+            <small>In this catalog</small>
+        </article>
+        <article class="catalog-card pc-summary-card">
+            <span>Projects</span>
+            <strong>{{ project_count }}</strong>
+            <small>Across all developers</small>
+        </article>
+        <article class="catalog-card pc-summary-card">
+            <span>Configurations</span>
+            <strong>{{ configuration_count }}</strong>
+            <small>Property options</small>
+        </article>
+    </section>
+
+    <section class="catalog-card pc-catalog-info" aria-labelledby="pc-catalog-name">
+        <div>
+            <span class="catalog-eyebrow">CATALOG DETAILS</span>
+            <h2 id="pc-catalog-name">{{ data.catalog_name|default:"Property Catalog" }}</h2>
+        </div>
+        <span class="pc-version-badge">Version {{ data.version|default:"1.0" }}</span>
+    </section>
+
+    {% for developer in developers %}
+    <section class="catalog-card pc-developer-card">
+        <header class="pc-developer-header">
+            <div>
+                <span class="catalog-eyebrow">DEVELOPER {{ forloop.counter }}</span>
+                <h2>{{ developer.name }}</h2>
+                {% if developer.developer_type %}
+                <span class="pc-developer-type">{{ developer.developer_type }}</span>
+                {% endif %}
+            </div>
+            <span class="pc-project-count">
+                {{ developer.projects|length }} project{{ developer.projects|length|pluralize }}
+            </span>
+        </header>
+
+        {% if developer.contact_person or developer.phone or developer.email %}
+        <div class="pc-contact-grid" aria-label="Developer contact details">
+            {% if developer.contact_person %}
+            <div>
+                <span>Contact person</span>
+                <strong>{{ developer.contact_person }}</strong>
+            </div>
+            {% endif %}
+            {% if developer.phone %}
+            <div>
+                <span>Phone</span>
+                <strong>{{ developer.phone }}</strong>
+            </div>
+            {% endif %}
+            {% if developer.email %}
+            <div>
+                <span>Email</span>
+                <strong>{{ developer.email }}</strong>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="pc-project-list">
+            {% for project in developer.projects %}
+            <article class="pc-project-card">
+                <header class="pc-project-header">
+                    <div class="pc-project-title">
+                        <span class="pc-project-type">{{ project.project_type|default:"OTHER" }}</span>
+                        <h3>{{ project.name }}</h3>
+                    </div>
+                    {% if project.project_details.status %}
+                    <span class="pc-status-badge">{{ project.project_details.status|cut:"_" }}</span>
+                    {% endif %}
+                </header>
+
+                {% if project.project_details %}
+                <div class="pc-project-facts">
+                    {% if project.project_details.total_land_area %}
+                    <div><span>Land area</span><strong>{{ project.project_details.total_land_area }}</strong></div>
+                    {% endif %}
+                    {% if project.project_details.total_towers %}
+                    <div><span>Towers</span><strong>{{ project.project_details.total_towers }}</strong></div>
+                    {% endif %}
+                    {% if project.project_details.total_floors %}
+                    <div><span>Floors</span><strong>{{ project.project_details.total_floors }}</strong></div>
+                    {% endif %}
+                    {% if project.project_details.total_units %}
+                    <div><span>Total units</span><strong>{{ project.project_details.total_units }}</strong></div>
+                    {% endif %}
+                </div>
+
+                {% if project.project_details.starting_price or project.project_details.price_per_sqft %}
+                <div class="pc-project-prices">
+                    {% if project.project_details.starting_price %}
+                    <div class="pc-price-tile">
+                        <span>Starting price</span>
+                        <strong class="pc-money" data-money-format="price" data-amount="{{ project.project_details.starting_price }}">₹{{ project.project_details.starting_price|floatformat:0 }}</strong>
+                    </div>
+                    {% endif %}
+                    {% if project.project_details.price_per_sqft %}
+                    <div class="pc-price-tile">
+                        <span>Price / Sq.Ft.</span>
+                        <strong class="pc-money" data-money-format="unit" data-amount="{{ project.project_details.price_per_sqft }}">₹{{ project.project_details.price_per_sqft|floatformat:2 }}</strong>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endif %}
+
+                {% if project.location %}
+                <section class="pc-project-section">
+                    <h4><span aria-hidden="true">⌖</span> Location</h4>
+                    <div class="pc-location-details">
+                        {% if project.location.locality %}<span><strong>Locality</strong>{{ project.location.locality }}</span>{% endif %}
+                        {% if project.location.city %}<span><strong>City</strong>{{ project.location.city }}</span>{% endif %}
+                        {% if project.location.district %}<span><strong>District</strong>{{ project.location.district }}</span>{% endif %}
+                        {% if project.location.state %}<span><strong>State</strong>{{ project.location.state }}</span>{% endif %}
+                        {% if project.location.pincode %}<span><strong>PIN code</strong>{{ project.location.pincode }}</span>{% endif %}
+                    </div>
+                    {% if project.location.google_maps_url|slice:":7" == "http://" or project.location.google_maps_url|slice:":8" == "https://" %}
+                    <a class="pc-map-link" href="{{ project.location.google_maps_url }}" target="_blank" rel="noopener noreferrer">Open map <span aria-hidden="true">↗</span></a>
+                    {% endif %}
+                </section>
+                {% endif %}
+
+                {% if project.highlights %}
+                <section class="pc-project-section">
+                    <h4>Highlights</h4>
+                    <div class="pc-chip-list">
+                        {% for highlight in project.highlights %}
+                        <span class="pc-chip">{{ highlight }}</span>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+
+                {% if project.amenities %}
+                <section class="pc-project-section">
+                    <h4>Amenities</h4>
+                    <div class="pc-chip-list">
+                        {% for amenity in project.amenities %}
+                        <span class="pc-chip">{{ amenity }}</span>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+
+                <section class="pc-project-section">
+                    <div class="pc-config-heading">
+                        <h4>Property configurations</h4>
+                        {% if project.configurations %}
+                        <span>{{ project.configurations|length }} type{{ project.configurations|length|pluralize }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if project.configurations %}
+                    <div class="pc-config-grid">
+                        {% for configuration in project.configurations %}
+                        <article class="pc-config-card">
+                            <header class="pc-config-header">
+                                <div>
+                                    <span class="pc-config-type">{{ configuration.property_type }}</span>
+                                    <h5>{{ configuration.type_name }}</h5>
+                                </div>
+                                {% if configuration.availability %}
+                                <span class="pc-availability">{{ configuration.availability|cut:"_" }}</span>
+                                {% endif %}
+                            </header>
+
+                            {% if configuration.description %}
+                            <p class="pc-config-description">{{ configuration.description }}</p>
+                            {% endif %}
+
+                            {% if configuration.bhk or configuration.bedrooms or configuration.bathrooms or configuration.balconies or configuration.built_up_area_sq_ft or configuration.carpet_area_sq_ft or configuration.super_built_up_area_sq_ft or configuration.plot_area_sq_yd or configuration.plot_area_sq_ft or configuration.road_width_ft or configuration.office_area_sq_ft or configuration.retail_area_sq_ft or configuration.frontage_ft or configuration.floor or configuration.facing or configuration.parking or configuration.parking_count or configuration.suitable_for or configuration.possession or configuration.maintenance_charges or configuration.price_per_sqyd %}
+                            <dl class="pc-config-details">
+                                {% if configuration.bhk %}<div><dt>Configuration</dt><dd>{{ configuration.bhk }} BHK</dd></div>{% endif %}
+                                {% if configuration.bedrooms %}<div><dt>Bedrooms</dt><dd>{{ configuration.bedrooms }}</dd></div>{% endif %}
+                                {% if configuration.bathrooms %}<div><dt>Bathrooms</dt><dd>{{ configuration.bathrooms }}</dd></div>{% endif %}
+                                {% if configuration.balconies %}<div><dt>Balconies</dt><dd>{{ configuration.balconies }}</dd></div>{% endif %}
+                                {% if configuration.built_up_area_sq_ft %}<div><dt>Built-up area</dt><dd>{{ configuration.built_up_area_sq_ft }} Sq.Ft.</dd></div>{% endif %}
+                                {% if configuration.carpet_area_sq_ft %}<div><dt>Carpet area</dt><dd>{{ configuration.carpet_area_sq_ft }} Sq.Ft.</dd></div>{% endif %}
+                                {% if configuration.super_built_up_area_sq_ft %}<div><dt>Super built-up area</dt><dd>{{ configuration.super_built_up_area_sq_ft }} Sq.Ft.</dd></div>{% endif %}
+                                {% if configuration.plot_area_sq_yd %}<div><dt>Plot area</dt><dd>{{ configuration.plot_area_sq_yd }} Sq.Yds.</dd></div>{% endif %}
+                                {% if configuration.plot_area_sq_ft %}<div><dt>Plot area</dt><dd>{{ configuration.plot_area_sq_ft }} Sq.Ft.</dd></div>{% endif %}
+                                {% if configuration.road_width_ft %}<div><dt>Road width</dt><dd>{{ configuration.road_width_ft }} Ft.</dd></div>{% endif %}
+                                {% if configuration.office_area_sq_ft %}<div><dt>Office area</dt><dd>{{ configuration.office_area_sq_ft }} Sq.Ft.</dd></div>{% endif %}
+                                {% if configuration.retail_area_sq_ft %}<div><dt>Retail area</dt><dd>{{ configuration.retail_area_sq_ft }} Sq.Ft.</dd></div>{% endif %}
+                                {% if configuration.frontage_ft %}<div><dt>Frontage</dt><dd>{{ configuration.frontage_ft }} Ft.</dd></div>{% endif %}
+                                {% if configuration.floor %}<div><dt>Floor</dt><dd>{{ configuration.floor }}</dd></div>{% endif %}
+                                {% if configuration.facing %}<div><dt>Facing</dt><dd>{{ configuration.facing|cut:"_"|title }}</dd></div>{% endif %}
+                                {% if configuration.parking %}<div><dt>Parking</dt><dd>{{ configuration.parking }}</dd></div>{% endif %}
+                                {% if configuration.parking_count %}<div><dt>Parking spaces</dt><dd>{{ configuration.parking_count }}</dd></div>{% endif %}
+                                {% if configuration.suitable_for %}<div><dt>Suitable for</dt><dd>{{ configuration.suitable_for }}</dd></div>{% endif %}
+                                {% if configuration.possession %}<div><dt>Possession</dt><dd>{{ configuration.possession }}</dd></div>{% endif %}
+                                {% if configuration.maintenance_charges %}<div><dt>Maintenance</dt><dd class="pc-money" data-money-format="unit" data-amount="{{ configuration.maintenance_charges }}">₹{{ configuration.maintenance_charges|floatformat:2 }}</dd></div>{% endif %}
+                                {% if configuration.price_per_sqyd %}<div><dt>Price / Sq.Yd.</dt><dd class="pc-money" data-money-format="unit" data-amount="{{ configuration.price_per_sqyd }}">₹{{ configuration.price_per_sqyd|floatformat:2 }}</dd></div>{% endif %}
+                            </dl>
+                            {% endif %}
+
+                            {% if configuration.amenities or configuration.features %}
+                            <div class="pc-config-chips">
+                                {% for item in configuration.amenities %}<span class="pc-chip">{{ item }}</span>{% endfor %}
+                                {% for item in configuration.features %}<span class="pc-chip">{{ item }}</span>{% endfor %}
+                            </div>
+                            {% endif %}
+
+                            {% if configuration.notes %}
+                            <p class="pc-config-notes">{{ configuration.notes }}</p>
+                            {% endif %}
+
+                            {% if configuration.basic_price or configuration.price_per_sqft %}
+                            <div class="pc-config-prices">
+                                {% if configuration.basic_price %}
+                                <div>
+                                    <span>Basic price</span>
+                                    <strong class="pc-money" data-money-format="price" data-amount="{{ configuration.basic_price }}">₹{{ configuration.basic_price|floatformat:0 }}</strong>
+                                </div>
+                                {% endif %}
+                                {% if configuration.price_per_sqft %}
+                                <div>
+                                    <span>Price / Sq.Ft.</span>
+                                    <strong class="pc-money" data-money-format="unit" data-amount="{{ configuration.price_per_sqft }}">₹{{ configuration.price_per_sqft|floatformat:2 }}</strong>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="pc-empty-state">No configurations found for this project.</p>
+                    {% endif %}
+                </section>
+            </article>
+            {% empty %}
+            <p class="pc-empty-state">No projects found for this developer.</p>
+            {% endfor %}
+        </div>
+    </section>
+    {% empty %}
+    <div class="catalog-card pc-empty-state">No developers found.</div>
+    {% endfor %}
+
+    <section class="catalog-card pc-preview-confirm">
+        <div>
+            <span class="catalog-eyebrow">FINAL STEP</span>
+            <h2>Ready to import?</h2>
+            <p>Check the information above before saving the catalog.</p>
+        </div>
+        <form method="post" class="pc-preview-actions">
+            {% csrf_token %}
+            <button type="submit" name="action" value="cancel" class="catalog-btn catalog-btn-light">Cancel</button>
+            <button type="submit" name="action" value="confirm" class="catalog-btn catalog-btn-primary">Confirm Import <span aria-hidden="true">→</span></button>
+        </form>
+    </section>
+</div>
+
+<script>
+    document.querySelectorAll(".pc-money").forEach((element) => {
+        const amount = Number(element.dataset.amount);
+        if (!Number.isFinite(amount)) return;
+
+        if (element.dataset.moneyFormat === "price" && amount >= 10000000) {
+            element.textContent = `₹${(amount / 10000000).toFixed(2)} Cr`;
+            return;
+        }
+
+        const maximumFractionDigits = element.dataset.moneyFormat === "unit" ? 2 : 0;
+        element.textContent = `₹${new Intl.NumberFormat("en-IN", {
+            maximumFractionDigits,
+            minimumFractionDigits: element.dataset.moneyFormat === "unit" ? 2 : 0,
+        }).format(amount)}`;
+    });
+</script>
+{% endblock %}

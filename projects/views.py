@@ -4,6 +4,7 @@ from .models import Project
 from developers.models import Developer
 from locations.models import Location
 from inventory.models import Inventory
+from decimal import Decimal
 
 
 def project_list(request):
@@ -61,6 +62,15 @@ def project_create(request):
             ),
             project_status=request.POST.get(
                 "project_status"    
+            ),
+            starting_price=(
+                Decimal(request.POST.get("starting_price")) * Decimal("10000000")
+                if request.POST.get("starting_price")
+                else None
+            ),
+            price_per_sqft=(
+                request.POST.get("price_per_sqft")
+                or None
             ),
 
             is_active=request.POST.get("is_active") == "on",
@@ -184,6 +194,13 @@ def project_edit(request, pk):
         )
         project.project_status = request.POST.get(
             "project_status"    
+        )
+        project.starting_price = (request.POST.get("starting_price")
+            or None
+        )
+        project.price_per_sqft = (
+            request.POST.get("price_per_sqft")
+            or None
         )
 
         project.status = request.POST.get(

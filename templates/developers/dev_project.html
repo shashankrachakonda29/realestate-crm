@@ -127,6 +127,24 @@ Developer Details
 
                         <div>
                             <span class="detail-label">
+                                Project Land
+                            </span>
+
+                            <strong>
+
+                                {% if project.total_land_acres %}
+                                    {{ project.total_land_acres }} Acres
+                                {% endif %}
+
+                                <!-- {% if project.total_land_guntas %}
+                                    {{ project.total_land_guntas }} Guntas
+                                {% endif %} -->
+
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span class="detail-label">
                                 Type
                             </span>
 
@@ -154,21 +172,6 @@ Developer Details
 
                             <strong>
                                 {{ project.total_units|default:"—" }}
-                            </strong>
-                        </div>
-
-
-                        <div>
-                            <span class="detail-label">
-                                Possession
-                            </span>
-
-                            <strong>
-                                {% if project.possession_date %}
-                                    {{ project.possession_date|date:"M Y" }}
-                                {% else %}
-                                    —
-                                {% endif %}
                             </strong>
                         </div>
 
@@ -234,21 +237,18 @@ Developer Details
                         </div>
                         <div>
                             <span class="detail-label">
-                                Project Land
+                                Possession
                             </span>
 
                             <strong>
-
-                                {% if project.total_land_acres %}
-                                    {{ project.total_land_acres }} Acres
+                                {% if project.possession_date %}
+                                    {{ project.possession_date|date:"M Y" }}
+                                {% else %}
+                                    —
                                 {% endif %}
-
-                                <!-- {% if project.total_land_guntas %}
-                                    {{ project.total_land_guntas }} Guntas
-                                {% endif %} -->
-
                             </strong>
                         </div>
+                        
 
                     </div>
 

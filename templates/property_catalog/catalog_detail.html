@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ catalog.name }} | Property Catalog{% endblock %}
+{% block page_heading %}Property Catalog{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/property_catalog.css' %}">
+
+<div class="catalog-page">
+    <header class="catalog-top">
+        <div>
+            <a href="{% url 'property_catalog:dashboard' %}" class="catalog-back">
+                ← All Catalogs
+            </a>
+            <h1>{{ catalog.name }}</h1>
+            <p>Version {{ catalog.version }} · Property portfolio</p>
+        </div>
+
+        <a href="{% url 'property_catalog:import_json' %}" class="catalog-btn catalog-btn-primary">
+            + Import JSON
+        </a>
+    </header>
+
+    <section class="catalog-summary">
+        <article class="summary-card">
+            <span class="summary-symbol">01</span>
+            <div>
+                <p>Total Developers</p>
+                <h2>{{ total_developers }}</h2>
+            </div>
+        </article>
+
+        <article class="summary-card">
+            <span class="summary-symbol">02</span>
+            <div>
+                <p>Total Projects</p>
+                <h2>{{ total_projects }}</h2>
+            </div>
+        </article>
+
+        <article class="summary-card">
+            <span class="summary-symbol">03</span>
+            <div>
+                <p>Project Types</p>
+                <h2>{{ total_project_types }}</h2>
+            </div>
+        </article>
+    </section>
+
+    <section class="type-overview">
+        <div class="section-heading">
+            <h2>Portfolio Overview</h2>
+            <p>Projects grouped by property category</p>
+        </div>
+
+        <div class="type-chips">
+            {% for type_name, count in project_type_counts.items %}
+                <div class="type-chip">
+                    <span>{{ type_name|title }}</span>
+                    <strong>{{ count }}</strong>
+                </div>
+            {% empty %}
+                <p>No project types available.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="developer-list">
+        {% for developer in developers %}
+            <section class="developer-group">
+                <header class="developer-bar">
+                    <div class="developer-initial">
+                        {{ developer.name|first|upper }}
+                    </div>
+
+                    <div class="developer-identity">
+                        <h2>{{ developer.name }}</h2>
+                        <p>
+                            {{ developer.developer_type|default:"Property Developer" }}
+                            {% if developer.phone %}
+                                · {{ developer.phone }}
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="developer-project-count">
+                        <strong>{{ developer.projects.all|length }}</strong>
+                        <span>Projects</span>
+                    </div>
+                </header>
+
+                <div class="project-grid">
+                    {% for project in developer.projects.all %}
+                        <article class="project-card">
+                            <div class="project-card-heading">
+                                <span class="project-category">
+                                    {{ project.project_type|default:"Property"|title }}
+                                </span>
+
+                                {% if project.status %}
+                                    <span class="project-status">
+                                        {{ project.status|title|cut:"_" }}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <h3 class="project-name">{{ project.name }}</h3>
+
+                            <p class="project-location">
+                                <span>⌖</span>
+                                {% if project.location %}
+                                    {{ project.location.locality }}
+                                    {% if project.location.city %}, {{ project.location.city }}{% endif %}
+                                {% else %}
+                                    Location not provided
+                                {% endif %}
+                            </p>
+
+                            <div class="project-price">
+                                <span>Starting price</span>
+                                <strong class="comma-format">
+                                    {% if project.starting_price %}
+                                        ₹{{ project.starting_price|floatformat:0 }}
+                                    {% else %}
+                                        Not provided
+                                    {% endif %}
+                                </strong>
+                            </div>
+
+                            <div class="project-meta">
+                                <div>
+                                    <span>Price / Sq.Ft.</span>
+                                    <strong class="comma-format">
+                                        {% if project.price_per_sqft %}
+                                            ₹{{ project.price_per_sqft|floatformat:0 }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>Configurations</span>
+                                    <strong>{{ project.configurations.all|length }}</strong>
+                                </div>
+                            </div>
+
+                            <details class="configuration-details-dropdown">
+                                <summary>
+                                    <span>Explore configurations</span>
+                                    <span class="configuration-toggle">+</span>
+                                </summary>
+
+                                <div class="configuration-list">
+                                    {% for configuration in project.configurations.all %}
+                                        <div class="configuration-item">
+                                            <div class="configuration-info">
+                                                <strong>
+                                                    {% if configuration.type_name %}
+                                                        {{ configuration.type_name }}
+                                                    {% elif configuration.bhk %}
+                                                        {{ configuration.bhk }} BHK
+                                                    {% else %}
+                                                        {{ configuration.property_type|title }}
+                                                    {% endif %}
+                                                </strong>
+
+
+                                                {% if configuration.built_up_area_sq_ft %}
+                                                    <p class="comma-format">{{ configuration.built_up_area_sq_ft|floatformat:0 }} Sq.Ft.</p>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="configuration-price">
+                                                {% if configuration.basic_price %}
+                                                    <strong class="comma-format">₹{{ configuration.basic_price|floatformat:0 }}</strong>
+                                                {% else %}
+                                                    <strong>Price not provided</strong>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="no-configurations">
+                                            No configurations available.
+                                        </p>
+                                    {% endfor %}
+                                </div>
+                            </details>
+                        </article>
+                    {% empty %}
+                        <p>No projects available for this developer.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        {% empty %}
+            <div class="catalog-empty">
+                <h3>No developers found</h3>
+                <p>Import a catalog to display developers and projects.</p>
+            </div>
+        {% endfor %}
+    </section>
+</div>
+
+{% load static %}
+
+<script src="{% static 'js/number_format.js' %}"></script>
+{% endblock %}

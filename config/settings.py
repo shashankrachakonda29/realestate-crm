@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'dashboard',
     "leads",
     "sitevisits",
+    "property_catalog"
 ]
 
 

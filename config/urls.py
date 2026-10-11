@@ -59,6 +59,10 @@ urlpatterns = [
         "inventory/",
         include("inventory.urls"),
     ),
+    path(
+        "property-catalog/",
+        include("property_catalog.urls"),
+    ),
     path("", include("dashboard.urls")),
     path(
         "leads/",
@@ -68,5 +72,9 @@ urlpatterns = [
     path(
     "site-visits/",
     include("sitevisits.urls"),
-),
+    ),
+    path(
+        "property-catalog/",
+        include("property_catalog.urls")
+    ),
 ]
