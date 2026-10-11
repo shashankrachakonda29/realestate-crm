@@ -14,7 +14,7 @@
         </a>
         <span class="catalog-eyebrow">PROPERTY CATALOG / PREVIEW</span>
         <h1>Review your property data</h1>
-        <p>Check the developers, projects and configurations before adding them to your catalog.</p>
+        <p>Review which records will be created, reused, or skipped for conflicts before confirming.</p>
     </header>
 
     {% if import_error %}
@@ -45,10 +45,41 @@
     <section class="catalog-card pc-catalog-info" aria-labelledby="pc-catalog-name">
         <div>
             <span class="catalog-eyebrow">CATALOG DETAILS</span>
-            <h2 id="pc-catalog-name">{{ data.catalog_name|default:"Property Catalog" }}</h2>
+            <h2 id="pc-catalog-name">{% if target_catalog %}{{ target_catalog.name }}{% else %}{{ data.catalog_name|default:"Property Catalog" }}{% endif %}</h2>
+            {% if target_catalog %}<p>Import destination selected; records are matched only inside this catalog.</p>{% else %}<p>A new isolated catalog will be created.</p>{% endif %}
         </div>
-        <span class="pc-version-badge">Version {{ data.version|default:"1.0" }}</span>
+        <span class="pc-version-badge">Version {% if target_catalog %}{{ target_catalog.version }}{% else %}{{ data.version|default:"1.0" }}{% endif %}</span>
     </section>
+
+    {% if preview_summary %}
+    <section class="pc-preview-summary" aria-label="Planned import actions">
+        <article class="catalog-card pc-summary-card"><span>Will create</span><strong>{{ preview_summary.created }}</strong></article>
+        <article class="catalog-card pc-summary-card"><span>Will reuse</span><strong>{{ preview_summary.reused }}</strong></article>
+        <article class="catalog-card pc-summary-card"><span>Skipped / conflicts</span><strong>{{ preview_summary.skipped }} / {{ preview_summary.conflicting }}</strong></article>
+    </section>
+    <section class="catalog-card" aria-labelledby="pc-import-actions-title">
+        <div class="catalog-card-header">
+            <div>
+                <span class="catalog-eyebrow">MATCH REVIEW</span>
+                <h2 id="pc-import-actions-title">Import record decisions</h2>
+                <p>Existing values are preserved. Differences listed below will not be overwritten.</p>
+            </div>
+        </div>
+        <div class="pc-project-list">
+            {% for record in preview_records %}
+            <div class="pc-project-card">
+                <strong>{{ record.kind }} · {{ record.path }}</strong>
+                <span class="pc-status-badge">{{ record.action|title }}</span>
+                {% if record.differences %}
+                <p>Conflicting fields: {{ record.differences|join:", " }}</p>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p>No records were found in the JSON.</p>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
 
     {% for developer in developers %}
     <section class="catalog-card pc-developer-card">
@@ -273,7 +304,7 @@
         <div>
             <span class="catalog-eyebrow">FINAL STEP</span>
             <h2>Ready to import?</h2>
-            <p>Check the information above before saving the catalog.</p>
+            <p>Confirm to create new records and reuse exact matches. Existing details will not be overwritten.</p>
         </div>
         <form method="post" class="pc-preview-actions">
             {% csrf_token %}

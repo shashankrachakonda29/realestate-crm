@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.utils import timezone
+from django.db.models import Count, Q
 
 from developers.models import Developer
 from projects.models import Project
@@ -169,55 +170,63 @@ def dashboard(request):
     ).order_by(
         "first_name",
         "username",
+    ).annotate(
+        total_leads=Count("assigned_leads", distinct=True),
+        new_leads=Count(
+            "assigned_leads",
+            filter=Q(assigned_leads__status=Lead.Status.NEW),
+            distinct=True,
+        ),
+        interested_leads=Count(
+            "assigned_leads",
+            filter=Q(assigned_leads__status=Lead.Status.INTERESTED),
+            distinct=True,
+        ),
+        site_visit_leads=Count(
+            "assigned_leads",
+            filter=Q(assigned_leads__status=Lead.Status.SITE_VISIT),
+            distinct=True,
+        ),
+        booked_leads=Count(
+            "assigned_leads",
+            filter=Q(assigned_leads__status=Lead.Status.BOOKED),
+            distinct=True,
+        ),
+        total_site_visits=Count("assigned_site_visits", distinct=True),
+        upcoming_site_visits=Count(
+            "assigned_site_visits",
+            filter=(
+                Q(assigned_site_visits__visit_date__gte=today)
+                & ~Q(
+                    assigned_site_visits__status__in=[
+                        SiteVisit.Status.CANCELLED,
+                        SiteVisit.Status.COMPLETED,
+                    ]
+                )
+            ),
+            distinct=True,
+        ),
+        followups=Count(
+            "assigned_leads",
+            filter=Q(assigned_leads__next_follow_up__date=today),
+            distinct=True,
+        ),
     )
 
     sales_team_stats = []
 
     for user in sales_users:
 
-        assigned_leads = Lead.objects.filter(
-            assigned_to=user
-        )
-
-        assigned_site_visits = SiteVisit.objects.filter(
-            assigned_to=user
-        )
-
         sales_team_stats.append({
             "user": user,
-
-            "total_leads": assigned_leads.count(),
-
-            "new_leads": assigned_leads.filter(
-                status=Lead.Status.NEW
-            ).count(),
-
-            "interested_leads": assigned_leads.filter(
-                status=Lead.Status.INTERESTED
-            ).count(),
-
-            "site_visit_leads": assigned_leads.filter(
-                status=Lead.Status.SITE_VISIT
-            ).count(),
-
-            "booked_leads": assigned_leads.filter(
-                status=Lead.Status.BOOKED
-            ).count(),
-
-            "total_site_visits": assigned_site_visits.count(),
-
-            "upcoming_site_visits": assigned_site_visits.filter(
-                visit_date__gte=today
-            ).exclude(
-                status__in=[
-                    SiteVisit.Status.CANCELLED,
-                    SiteVisit.Status.COMPLETED,
-                ]
-            ).count(),
-
-            "followups": assigned_leads.filter(
-                next_follow_up__date=today
-            ).count(),
+            "total_leads": user.total_leads,
+            "new_leads": user.new_leads,
+            "interested_leads": user.interested_leads,
+            "site_visit_leads": user.site_visit_leads,
+            "booked_leads": user.booked_leads,
+            "total_site_visits": user.total_site_visits,
+            "upcoming_site_visits": user.upcoming_site_visits,
+            "followups": user.followups,
         })
 
     # =====================================================

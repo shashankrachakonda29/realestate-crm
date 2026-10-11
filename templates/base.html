@@ -151,11 +151,14 @@
                     <span class="nav-text">Site Visits</span>
                 </a>
 
-                <a href="{% url 'user_list' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_edit' or request.resolver_match.url_name == 'user_password' %}active{% endif %}">
-                    <span class="nav-icon">◌</span>
-                    <span class="nav-text">Team</span>
-                </a>
+                {% if request.user.role == "ADMIN" %}
+                    <a href="{% url 'user_list' %}"
+                        class="nav-item {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_edit' or request.resolver_match.url_name == 'user_password' %}active{% endif %}">
+
+                        <span class="nav-icon">◌</span>
+                        <span class="nav-text">Team</span>
+                    </a>
+                {% endif %}
 
             </nav>
 
@@ -262,7 +265,10 @@
                         </div>
 
                         {% if request.user.is_authenticated %}
-                            <a class="logout-link" href="{% url 'logout' %}">Logout</a>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button class="logout-link" type="submit">Logout</button>
+                            </form>
                         {% endif %}
 
                     </div>

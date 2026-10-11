@@ -1,8 +1,12 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db.models import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Location
 
 
+@login_required
 def location_list(request):
     search = request.GET.get("search", "").strip()
 
@@ -25,6 +29,7 @@ def location_list(request):
     )
 
 
+@login_required
 def location_create(request):
 
     if request.method == "POST":
@@ -88,6 +93,7 @@ def location_create(request):
             "location": None,
         },
     )
+@login_required
 def location_detail(request, pk):
 
     location = get_object_or_404(
@@ -104,6 +110,7 @@ def location_detail(request, pk):
     )
 
 
+@login_required
 def location_edit(request, pk):
 
     location = get_object_or_404(
@@ -166,6 +173,7 @@ def location_edit(request, pk):
     )
 
 
+@login_required
 def location_delete(request, pk):
 
     location = get_object_or_404(
@@ -174,8 +182,14 @@ def location_delete(request, pk):
     )
 
     if request.method == "POST":
-
-        location.delete()
+        try:
+            location.delete()
+        except ProtectedError:
+            messages.error(
+                request,
+                "This location cannot be deleted because it is used by a project.",
+            )
+            return redirect("location_detail", pk=location.pk)
 
         return redirect("location_list")
 

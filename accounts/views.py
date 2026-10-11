@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import SetPasswordForm
+from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, render, redirect
 
 from .decorators import role_required
@@ -54,6 +55,7 @@ def login_view(request):
 # LOGOUT
 # =====================================================
 
+@require_POST
 def logout_view(request):
 
     logout(request)

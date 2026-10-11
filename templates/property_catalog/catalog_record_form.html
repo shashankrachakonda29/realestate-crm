@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Property Catalog{% endblock %}
+{% block page_heading %}{{ title }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/property_catalog.css' %}">
+
+<div class="catalog-page">
+    <header class="catalog-header">
+        <div>
+            <a class="catalog-back" href="{{ cancel_url }}">← Back</a>
+            <span class="catalog-eyebrow">{{ catalog.name }}</span>
+            <h1>{{ title }}</h1>
+            {% if developer %}<p>Developer: {{ developer.name }}</p>{% endif %}
+            {% if project %}<p>Project: {{ project.name }}</p>{% endif %}
+        </div>
+    </header>
+
+    <section class="catalog-card">
+        <form method="post" class="catalog-record-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="catalog-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+            {{ form.as_p }}
+            <div class="catalog-card-footer">
+                <a href="{{ cancel_url }}" class="catalog-btn catalog-btn-light">Cancel</a>
+                <button type="submit" class="catalog-btn catalog-btn-primary">Save {{ title|cut:"Add " }}</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

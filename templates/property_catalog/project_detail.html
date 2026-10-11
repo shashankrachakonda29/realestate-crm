@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ project.name }} | Property Catalog{% endblock %}
+{% block page_heading %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/property_catalog.css' %}">
+<div class="catalog-page">
+    <header class="catalog-header">
+        <div>
+            <a class="catalog-back" href="{% url 'property_catalog:catalog_developer_detail' catalog.pk project.developer.pk %}">← {{ project.developer.name }}</a>
+            <span class="catalog-eyebrow">{{ project.project_type|title }}{% if project.status %} · {{ project.status }}{% endif %}</span>
+            <h1>{{ project.name }}</h1>
+            <p>{{ catalog.name }}</p>
+        </div>
+        <a class="catalog-btn catalog-btn-primary" href="{% url 'property_catalog:catalog_configuration_create' catalog.pk project.pk %}">+ Add Configuration</a>
+    </header>
+
+    <section class="catalog-card">
+        <div class="catalog-card-header">
+            <div><span class="catalog-eyebrow">CONFIGURATIONS</span><h2>{{ project.configurations.count }} option{{ project.configurations.count|pluralize }}</h2></div>
+        </div>
+        <div class="pc-config-grid">
+            {% for configuration in project.configurations.all %}
+            <article class="pc-config-card" id="configuration-{{ configuration.pk }}">
+                <header class="pc-config-header">
+                    <div><span class="pc-config-type">{{ configuration.get_property_type_display }}</span><h3>{{ configuration.type_name }}</h3></div>
+                    {% if configuration.availability %}<span class="pc-availability">{{ configuration.availability }}</span>{% endif %}
+                </header>
+                {% if configuration.description %}<p>{{ configuration.description }}</p>{% endif %}
+                <dl class="pc-config-details">
+                    {% if configuration.bhk %}<div><dt>BHK</dt><dd>{{ configuration.bhk }}</dd></div>{% endif %}
+                    {% if configuration.bedrooms %}<div><dt>Bedrooms</dt><dd>{{ configuration.bedrooms }}</dd></div>{% endif %}
+                    {% if configuration.bathrooms %}<div><dt>Bathrooms</dt><dd>{{ configuration.bathrooms }}</dd></div>{% endif %}
+                    {% if configuration.facing %}<div><dt>Facing</dt><dd>{{ configuration.get_facing_display }}</dd></div>{% endif %}
+                    {% if configuration.built_up_area_sq_ft %}<div><dt>Built-up area</dt><dd>{{ configuration.built_up_area_sq_ft }} sq. ft.</dd></div>{% endif %}
+                    {% if configuration.super_built_up_area_sq_ft %}<div><dt>Super built-up area</dt><dd>{{ configuration.super_built_up_area_sq_ft }} sq. ft.</dd></div>{% endif %}
+                    {% if configuration.carpet_area_sq_ft %}<div><dt>Carpet area</dt><dd>{{ configuration.carpet_area_sq_ft }} sq. ft.</dd></div>{% endif %}
+                    {% if configuration.plot_area_sq_ft %}<div><dt>Plot area</dt><dd>{{ configuration.plot_area_sq_ft }} sq. ft.</dd></div>{% endif %}
+                    {% if configuration.plot_area_sq_yd %}<div><dt>Plot area</dt><dd>{{ configuration.plot_area_sq_yd }} sq. yd.</dd></div>{% endif %}
+                    {% if configuration.office_area_sq_ft %}<div><dt>Office area</dt><dd>{{ configuration.office_area_sq_ft }} sq. ft.</dd></div>{% endif %}
+                    {% if configuration.retail_area_sq_ft %}<div><dt>Retail area</dt><dd>{{ configuration.retail_area_sq_ft }} sq. ft.</dd></div>{% endif %}
+                    {% if configuration.basic_price %}<div><dt>Price</dt><dd>₹{{ configuration.basic_price|floatformat:0 }}</dd></div>{% endif %}
+                    {% if configuration.price_per_sqft %}<div><dt>Price / sq. ft.</dt><dd>₹{{ configuration.price_per_sqft|floatformat:2 }}</dd></div>{% endif %}
+                    {% if configuration.possession %}<div><dt>Possession</dt><dd>{{ configuration.possession }}</dd></div>{% endif %}
+                </dl>
+                {% if configuration.amenities or configuration.features %}
+                <div class="pc-config-chips">
+                    {% for item in configuration.amenities %}<span class="pc-chip">{{ item }}</span>{% endfor %}
+                    {% for item in configuration.features %}<span class="pc-chip">{{ item }}</span>{% endfor %}
+                </div>
+                {% endif %}
+                {% if configuration.notes %}<p>{{ configuration.notes }}</p>{% endif %}
+            </article>
+            {% empty %}
+            <div class="catalog-empty-state">No configurations have been added yet.</div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,12 +1,35 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Max, Min, ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
-from django.db.models import Count, Min, Max
-from .models import Project
+from decimal import Decimal, InvalidOperation
+
 from developers.models import Developer
-from locations.models import Location
 from inventory.models import Inventory
-from decimal import Decimal
+from locations.models import Location
+from .models import Project
 
 
+def _starting_price_in_crores(value):
+    value = (value or "").strip()
+    if not value:
+        return None
+    try:
+        amount = Decimal(value)
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise ValueError("Starting price must be a valid amount in crores.") from exc
+    if not amount.is_finite() or amount < 0:
+        raise ValueError("Starting price must be a non-negative amount in crores.")
+    exponent = amount.as_tuple().exponent
+    if exponent < -14 or exponent > 14 or amount.adjusted() > 14:
+        raise ValueError("Starting price must fit within 15 characters.")
+    formatted_amount = format(amount, "f")
+    if len(formatted_amount) > 15:
+        raise ValueError("Starting price must fit within 15 characters.")
+    return formatted_amount
+
+
+@login_required
 def project_list(request):
 
     search = request.GET.get("search", "").strip()
@@ -32,6 +55,7 @@ def project_list(request):
     )
 
 
+@login_required
 def project_create(request):
 
     developers = Developer.objects.filter(
@@ -43,6 +67,13 @@ def project_create(request):
     ).order_by("name")
 
     if request.method == "POST":
+        try:
+            starting_price = _starting_price_in_crores(
+                request.POST.get("starting_price")
+            )
+        except ValueError as exc:
+            messages.error(request, str(exc))
+            return redirect("project_create")
 
         Project.objects.create(
             name=request.POST.get(
@@ -63,11 +94,7 @@ def project_create(request):
             project_status=request.POST.get(
                 "project_status"    
             ),
-            starting_price=(
-                Decimal(request.POST.get("starting_price")) * Decimal("10000000")
-                if request.POST.get("starting_price")
-                else None
-            ),
+            starting_price=starting_price,
             price_per_sqft=(
                 request.POST.get("price_per_sqft")
                 or None
@@ -140,6 +167,7 @@ def project_create(request):
     )
 
 
+@login_required
 def project_detail(request, pk):
 
     project = get_object_or_404(
@@ -159,6 +187,7 @@ def project_detail(request, pk):
     )
 
 
+@login_required
 def project_edit(request, pk):
 
     project = get_object_or_404(
@@ -176,6 +205,13 @@ def project_edit(request, pk):
    
 
     if request.method == "POST":
+        try:
+            project.starting_price = _starting_price_in_crores(
+                request.POST.get("starting_price")
+            )
+        except ValueError as exc:
+            messages.error(request, str(exc))
+            return redirect("project_edit", pk=project.pk)
 
         project.name = request.POST.get(
             "name", ""
@@ -194,9 +230,6 @@ def project_edit(request, pk):
         )
         project.project_status = request.POST.get(
             "project_status"    
-        )
-        project.starting_price = (request.POST.get("starting_price")
-            or None
         )
         project.price_per_sqft = (
             request.POST.get("price_per_sqft")
@@ -283,6 +316,7 @@ def project_edit(request, pk):
     )
 
 
+@login_required
 def project_delete(request, pk):
 
     project = get_object_or_404(
@@ -291,8 +325,14 @@ def project_delete(request, pk):
     )
 
     if request.method == "POST":
-
-        project.delete()
+        try:
+            project.delete()
+        except ProtectedError:
+            messages.error(
+                request,
+                "This project cannot be deleted while it has inventory records.",
+            )
+            return redirect("project_detail", pk=project.pk)
 
         return redirect("project_list")
 
@@ -306,6 +346,7 @@ def project_delete(request, pk):
     )
 
 
+@login_required
 def project_inventory(request, project_id):
 
     project = get_object_or_404(
@@ -359,6 +400,7 @@ def project_inventory(request, project_id):
         },
     )
 
+@login_required
 def project_inventory_bhk(request, project_id, bhk):
 
     project = get_object_or_404(

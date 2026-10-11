@@ -73,8 +73,4 @@ urlpatterns = [
     "site-visits/",
     include("sitevisits.urls"),
     ),
-    path(
-        "property-catalog/",
-        include("property_catalog.urls")
-    ),
 ]

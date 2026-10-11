@@ -43,6 +43,15 @@ Property Catalog
         <form method="post" enctype="multipart/form-data" class="catalog-upload-form">
             {% csrf_token %}
 
+            <div class="catalog-form-field">
+                <label for="{{ form.target_catalog.id_for_label }}">{{ form.target_catalog.label }}</label>
+                {{ form.target_catalog }}
+                <small>Choose an existing catalog to check and reuse its records. Leave this as “Create a new catalog” to keep the import isolated.</small>
+                {% if form.target_catalog.errors %}
+                    <div class="catalog-error">{{ form.target_catalog.errors }}</div>
+                {% endif %}
+            </div>
+
             <label for="{{ form.json_file.id_for_label }}" class="upload-dropzone" aria-label="Upload property catalog JSON file">
                 <div class="upload-drop-icon">↑</div>
                 <strong>Choose JSON file</strong>

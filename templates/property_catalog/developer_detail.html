@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ developer.name }} | Property Catalog{% endblock %}
+{% block page_heading %}{{ developer.name }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/property_catalog.css' %}">
+<div class="catalog-page">
+    <header class="catalog-header">
+        <div>
+            <a class="catalog-back" href="{% url 'property_catalog:catalog_detail' catalog.pk %}">← {{ catalog.name }}</a>
+            <span class="catalog-eyebrow">CATALOG DEVELOPER</span>
+            <h1>{{ developer.name }}</h1>
+            {% if developer.developer_type %}<p>{{ developer.developer_type }}</p>{% endif %}
+            {% if developer.contact_person %}<p>Contact: {{ developer.contact_person }}</p>{% endif %}
+            {% if developer.phone %}<p>Phone: {{ developer.phone }}</p>{% endif %}
+            {% if developer.email %}<p>Email: {{ developer.email }}</p>{% endif %}
+            {% if developer.website %}<p><a href="{{ developer.website }}" rel="noopener noreferrer">{{ developer.website }}</a></p>{% endif %}
+        </div>
+        <a class="catalog-btn catalog-btn-primary" href="{% url 'property_catalog:catalog_project_create' catalog.pk developer.pk %}">+ Add Project</a>
+    </header>
+
+    <section class="catalog-card">
+        <div class="catalog-card-header">
+            <div><span class="catalog-eyebrow">PROJECTS</span><h2>{{ developer.projects.count }} project{{ developer.projects.count|pluralize }}</h2></div>
+        </div>
+        {% for project in developer.projects.all %}
+        <article class="catalog-list-item">
+            <div>
+                <span class="catalog-eyebrow">{{ project.project_type|title }}</span>
+                <h3><a href="{% url 'property_catalog:catalog_project_detail' catalog.pk project.pk %}">{{ project.name }}</a></h3>
+                {% if project.status %}<p>{{ project.status }}</p>{% endif %}
+            </div>
+            <a class="catalog-btn catalog-btn-light" href="{% url 'property_catalog:catalog_project_detail' catalog.pk project.pk %}">Open project</a>
+        </article>
+        {% empty %}
+        <div class="catalog-empty-state">No projects have been added for this developer.</div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

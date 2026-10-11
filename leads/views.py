@@ -224,6 +224,12 @@ def lead_import_mapping(request):
 # PIPELINE
 # =====================================================
 
+@require_roles(
+    "ADMIN",
+    "MANAGER",
+    "SALES",
+    "VIEWER",
+)
 def lead_pipeline(request):
 
     leads = get_sales_lead_queryset(

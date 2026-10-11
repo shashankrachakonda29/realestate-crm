@@ -1,5 +1,6 @@
+from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.db.models import ProtectedError,Count,Prefetch,Min
+from django.db.models import ProtectedError, Count, Prefetch, Min
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Developer
@@ -7,6 +8,7 @@ from .models import Developer
 from inventory.models import Inventory
 
 
+@login_required
 def developer_list(request):
     search = request.GET.get("search", "").strip()
 
@@ -55,6 +57,7 @@ def developer_list(request):
             "search": search,
         },
     )
+@login_required
 def developer_create(request):
 
     if request.method == "POST":
@@ -206,6 +209,7 @@ def developer_create(request):
 #         },
 #     )
 
+@login_required
 def developer_detail(request, pk):
 
     developer = get_object_or_404(
@@ -263,6 +267,7 @@ def developer_detail(request, pk):
         },
     )
 # Developer under Projects View
+@login_required
 def developer_projects(request, pk):
 
     developer = get_object_or_404(
@@ -339,6 +344,7 @@ def developer_projects(request, pk):
 
 # Developer Edit View
 
+@login_required
 def developer_edit(request, pk):
 
     developer = get_object_or_404(
@@ -397,6 +403,7 @@ def developer_edit(request, pk):
     )
 
 
+@login_required
 def developer_delete(request, pk):
 
     developer = get_object_or_404(

@@ -4,6 +4,7 @@ from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
@@ -35,6 +36,7 @@ def decimal_value(value):
         return Decimal("0")
 
 
+@login_required
 def inventory_list(request):
     search = request.GET.get("search", "").strip()
     project_id = request.GET.get("project", "").strip()
@@ -69,6 +71,7 @@ def inventory_list(request):
     })
 
 
+@login_required
 def inventory_create(request):
     projects = Project.objects.filter(is_active=True).select_related("developer", "location").order_by("name")
     if request.method == "POST":
@@ -90,11 +93,13 @@ def inventory_create(request):
     return render(request, "inventory/form.html", {"title": "Add Inventory", "inventory_item": None, "projects": projects, "property_types": Inventory.PropertyType.choices, "statuses": Inventory.Status.choices})
 
 
+@login_required
 def inventory_detail(request, pk):
     item = get_object_or_404(Inventory.objects.select_related("project", "project__developer", "project__location"), pk=pk)
     return render(request, "inventory/detail.html", {"inventory_item": item})
 
 
+@login_required
 def inventory_edit(request, pk):
     item = get_object_or_404(Inventory, pk=pk)
     projects = Project.objects.filter(is_active=True).select_related("developer", "location").order_by("name")
@@ -108,6 +113,7 @@ def inventory_edit(request, pk):
     return render(request, "inventory/form.html", {"title": "Edit Inventory", "inventory_item": item, "projects": projects, "property_types": Inventory.PropertyType.choices, "statuses": Inventory.Status.choices})
 
 
+@login_required
 def inventory_delete(request, pk):
     item = get_object_or_404(Inventory, pk=pk)
     if request.method == "POST":
@@ -356,6 +362,7 @@ def save_import(data, configurations, filename):
     return created_count, updated_count
 
 
+@login_required
 def inventory_import(request):
     def preview_context(data, filename, errors=None, json_import=False):
         configurations = data.get("unit_configurations", [])

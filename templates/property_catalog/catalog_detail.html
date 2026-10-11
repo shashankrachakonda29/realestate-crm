@@ -6,6 +6,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/property_catalog.css' %}">
+<link rel="stylesheet" href="{% static 'css/property_catalog_detail.css' %}">
 
 <div class="catalog-page">
     <header class="catalog-top">
@@ -17,10 +18,201 @@
             <p>Version {{ catalog.version }} · Property portfolio</p>
         </div>
 
-        <a href="{% url 'property_catalog:import_json' %}" class="catalog-btn catalog-btn-primary">
-            + Import JSON
-        </a>
+        <div class="catalog-detail-actions">
+            <a href="{% url 'property_catalog:catalog_developer_create' catalog.pk %}" class="catalog-btn catalog-btn-light">+ Add Developer</a>
+            <a href="{% url 'property_catalog:import_json' %}?catalog={{ catalog.pk }}" class="catalog-btn catalog-btn-primary">+ Import JSON</a>
+        </div>
     </header>
+
+    <form method="get" class="catalog-search-form" id="catalogSearchForm">
+        <div class="catalog-search-toolbar">
+            <label class="catalog-search-input-wrap" for="{{ search_form.keyword.id_for_label }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <path d="m16 16 4.5 4.5"></path>
+                </svg>
+                {{ search_form.keyword }}
+            </label>
+            <button type="submit" class="catalog-search-submit">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <path d="m16 16 4.5 4.5"></path>
+                </svg>
+                <span>Search</span>
+            </button>
+            <button
+                type="button"
+                class="catalog-filter-toggle"
+                id="catalogFilterToggle"
+                aria-expanded="false"
+                aria-controls="catalogFilterDrawer"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 7h9M17 7h3M4 17h3m4 0h9"></path>
+                    <circle cx="15" cy="7" r="2"></circle>
+                    <circle cx="9" cy="17" r="2"></circle>
+                </svg>
+                <span>Filters</span>
+                {% if active_filter_count %}
+                    <span class="catalog-filter-count">{{ active_filter_count }}</span>
+                {% endif %}
+            </button>
+            {% if has_active_filters %}
+                <a class="catalog-clear-all" href="{{ clear_filters_url }}">Clear all</a>
+            {% endif %}
+            <div class="catalog-result-counts" aria-live="polite">
+                <span><strong>{{ total_projects }}</strong> projects</span>
+                <span><strong>{{ total_configurations }}</strong> configurations</span>
+            </div>
+        </div>
+
+        {{ search_form.location }}
+        {% if search_form.keyword.errors %}
+            <p class="catalog-search-error">{{ search_form.keyword.errors|join:", " }}</p>
+        {% endif %}
+
+        <div class="catalog-active-chips" aria-label="Active search filters">
+            {% for chip in active_filter_chips %}
+                <a class="catalog-filter-chip" href="{{ chip.url }}">
+                    <span>{{ chip.label }}</span>
+                    <span class="catalog-chip-remove" aria-hidden="true">×</span>
+                    <span class="catalog-sr-only">Remove {{ chip.label }}</span>
+                </a>
+            {% endfor %}
+        </div>
+
+        <button
+            type="button"
+            class="catalog-drawer-backdrop"
+            id="catalogFilterBackdrop"
+            aria-label="Close filters"
+            tabindex="-1"
+        ></button>
+        <aside
+            class="catalog-filter-drawer"
+            id="catalogFilterDrawer"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="catalog-filter-title"
+            aria-hidden="true"
+        >
+            <header class="catalog-drawer-header">
+                <div>
+                    <span class="catalog-search-eyebrow">Customer matching</span>
+                    <h2 id="catalog-filter-title">Property filters</h2>
+                    <p>Refine results using saved catalog details.</p>
+                </div>
+                <button type="button" class="catalog-drawer-close" id="catalogFilterClose" aria-label="Close filters">×</button>
+            </header>
+
+            <div class="catalog-drawer-content">
+                {% if search_form.errors %}
+                    <div class="catalog-search-error-list" role="alert">
+                        {% for field in search_form %}
+                            {% for error in field.errors %}
+                                <p class="catalog-search-error">{{ field.label }}: {{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <details class="catalog-filter-section" open>
+                    <summary>Project <span aria-hidden="true">⌄</span></summary>
+                    <div class="catalog-filter-fields">
+                        {% for field in search_form %}
+                            {% if field.name == "developer" or field.name == "project" or field.name == "project_type" or field.name == "status" %}
+                                <div class="catalog-search-field{% if field.errors %} has-errors{% endif %}">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </details>
+                <details class="catalog-filter-section">
+                    <summary>Property requirements <span aria-hidden="true">⌄</span></summary>
+                    <div class="catalog-filter-fields">
+                        {% for field in search_form %}
+                            {% if field.name == "property_type" or field.name == "bhk" or field.name == "facing" or field.name == "availability" or field.name == "possession" %}
+                                <div class="catalog-search-field{% if field.errors %} has-errors{% endif %}">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </details>
+                <details class="catalog-filter-section">
+                    <summary>Budget <span aria-hidden="true">⌄</span></summary>
+                    <div class="catalog-filter-fields catalog-filter-fields-two">
+                        {% for field in search_form %}
+                            {% if field.name == "min_budget" or field.name == "max_budget" or field.name == "min_price_per_sqft" or field.name == "max_price_per_sqft" %}
+                                <div class="catalog-search-field{% if field.errors %} has-errors{% endif %}">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </details>
+                <details class="catalog-filter-section">
+                    <summary>Location <span aria-hidden="true">⌄</span></summary>
+                    <div class="catalog-filter-fields catalog-filter-fields-two">
+                        {% for field in search_form %}
+                            {% if field.name == "locality" or field.name == "city" or field.name == "district" or field.name == "state" or field.name == "pincode" %}
+                                <div class="catalog-search-field{% if field.errors %} has-errors{% endif %}">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </details>
+                <details class="catalog-filter-section">
+                    <summary>Area <span aria-hidden="true">⌄</span></summary>
+                    <div class="catalog-filter-fields catalog-filter-fields-two">
+                        {% for field in search_form %}
+                            {% if field.name == "min_area" or field.name == "max_area" %}
+                                <div class="catalog-search-field{% if field.errors %} has-errors{% endif %}">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        <p class="catalog-filter-help">Area is matched against available built-up, super built-up, carpet, plot, office, and retail areas.</p>
+                    </div>
+                </details>
+                <details class="catalog-filter-section">
+                    <summary>Amenities and features <span aria-hidden="true">⌄</span></summary>
+                    <div class="catalog-filter-fields">
+                        {% for field in search_form %}
+                            {% if field.name == "amenity" or field.name == "feature" %}
+                                <div class="catalog-search-field{% if field.errors %} has-errors{% endif %}">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    <span class="catalog-filter-help">Use Ctrl (Windows) or Command (Mac) to select multiple values.</span>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </details>
+                <details class="catalog-filter-section">
+                    <summary>Additional search <span aria-hidden="true">⌄</span></summary>
+                    <div class="catalog-filter-fields">
+                        <div class="catalog-search-field{% if search_form.notes.errors %} has-errors{% endif %}">
+                            <label for="{{ search_form.notes.id_for_label }}">{{ search_form.notes.label }}</label>
+                            {{ search_form.notes }}
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <footer class="catalog-drawer-footer">
+                <a href="{{ reset_filters_url }}" class="catalog-drawer-reset">Reset</a>
+                <button type="submit" form="catalogSearchForm" class="catalog-btn catalog-btn-primary">Apply Filters</button>
+            </footer>
+        </aside>
+    </form>
 
     <section class="catalog-summary">
         <article class="summary-card">
@@ -75,7 +267,7 @@
                     </div>
 
                     <div class="developer-identity">
-                        <h2>{{ developer.name }}</h2>
+                        <h2><a href="{% url 'property_catalog:catalog_developer_detail' catalog.pk developer.pk %}">{{ developer.name }}</a></h2>
                         <p>
                             {{ developer.developer_type|default:"Property Developer" }}
                             {% if developer.phone %}
@@ -85,13 +277,14 @@
                     </div>
 
                     <div class="developer-project-count">
-                        <strong>{{ developer.projects.all|length }}</strong>
+                        <strong>{{ developer.matching_projects|length }}</strong>
                         <span>Projects</span>
                     </div>
+                    <a href="{% url 'property_catalog:catalog_project_create' catalog.pk developer.pk %}" class="catalog-btn catalog-btn-light">+ Add Project</a>
                 </header>
 
                 <div class="project-grid">
-                    {% for project in developer.projects.all %}
+                    {% for project in developer.matching_projects %}
                         <article class="project-card">
                             <div class="project-card-heading">
                                 <span class="project-category">
@@ -105,44 +298,45 @@
                                 {% endif %}
                             </div>
 
-                            <h3 class="project-name">{{ project.name }}</h3>
+                            <h3 class="project-name"><a href="{% url 'property_catalog:catalog_project_detail' catalog.pk project.pk %}">{{ project.name }}</a></h3>
 
-                            <p class="project-location">
-                                <span>⌖</span>
-                                {% if project.location %}
-                                    {{ project.location.locality }}
-                                    {% if project.location.city %}, {{ project.location.city }}{% endif %}
-                                {% else %}
-                                    Location not provided
+                            {% if project.location %}
+                                {% if project.location.locality or project.location.city or project.location.district or project.location.state or project.location.pincode %}
+                                    <p class="project-location">
+                                        <span>⌖</span>
+                                    {% if project.location.locality %}{{ project.location.locality }}{% endif %}
+                                    {% if project.location.city %}{% if project.location.locality %}, {% endif %}{{ project.location.city }}{% endif %}
+                                    {% if project.location.district %}{% if project.location.city or project.location.locality %}, {% endif %}{{ project.location.district }}{% endif %}
+                                    {% if project.location.state %}{% if project.location.city or project.location.locality or project.location.district %}, {% endif %}{{ project.location.state }}{% endif %}
+                                    {% if project.location.pincode %} · {{ project.location.pincode }}{% endif %}
+                                    </p>
                                 {% endif %}
-                            </p>
+                            {% endif %}
 
+                            <p class="project-developer">Developer: {{ developer.name }}</p>
+
+                            {% if project.display_starting_price != None %}
                             <div class="project-price">
                                 <span>Starting price</span>
                                 <strong class="comma-format">
-                                    {% if project.starting_price %}
-                                        ₹{{ project.starting_price|floatformat:0 }}
-                                    {% else %}
-                                        Not provided
-                                    {% endif %}
+                                    ₹{{ project.display_starting_price|floatformat:0 }}
                                 </strong>
                             </div>
+                            {% endif %}
 
                             <div class="project-meta">
-                                <div>
-                                    <span>Price / Sq.Ft.</span>
-                                    <strong class="comma-format">
-                                        {% if project.price_per_sqft %}
-                                            ₹{{ project.price_per_sqft|floatformat:0 }}
-                                        {% else %}
-                                            —
-                                        {% endif %}
-                                    </strong>
-                                </div>
+                                {% if project.display_price_per_sqft != None %}
+                                    <div>
+                                        <span>Price / Sq.Ft.</span>
+                                        <strong class="comma-format">
+                                            ₹{{ project.display_price_per_sqft|floatformat:0 }}
+                                        </strong>
+                                    </div>
+                                {% endif %}
 
                                 <div>
                                     <span>Configurations</span>
-                                    <strong>{{ project.configurations.all|length }}</strong>
+                                    <strong>{{ project.matching_configuration_count }}</strong>
                                 </div>
                             </div>
 
@@ -153,30 +347,63 @@
                                 </summary>
 
                                 <div class="configuration-list">
-                                    {% for configuration in project.configurations.all %}
+                                    {% for configuration in project.matching_configurations %}
                                         <div class="configuration-item">
                                             <div class="configuration-info">
                                                 <strong>
                                                     {% if configuration.type_name %}
                                                         {{ configuration.type_name }}
-                                                    {% elif configuration.bhk %}
-                                                        {{ configuration.bhk }} BHK
                                                     {% else %}
-                                                        {{ configuration.property_type|title }}
+                                                        {{ configuration.get_property_type_display }}
                                                     {% endif %}
                                                 </strong>
 
-
-                                                {% if configuration.built_up_area_sq_ft %}
-                                                    <p class="comma-format">{{ configuration.built_up_area_sq_ft|floatformat:0 }} Sq.Ft.</p>
+                                                {% if configuration.type_name %}
+                                                    <p>{{ configuration.get_property_type_display }}</p>
                                                 {% endif %}
+                                                {% if configuration.display_bhk %}
+                                                    <p>{{ configuration.display_bhk }}</p>
+                                                {% endif %}
+                                                {% if configuration.facing %}
+                                                    <p>{{ configuration.get_facing_display }}</p>
+                                                {% endif %}
+                                                {% if configuration.built_up_area_sq_ft %}
+                                                    <p class="comma-format">Built-up: {{ configuration.built_up_area_sq_ft|floatformat:0 }} Sq.Ft.</p>
+                                                {% endif %}
+                                                {% if configuration.super_built_up_area_sq_ft %}
+                                                    <p class="comma-format">Super built-up: {{ configuration.super_built_up_area_sq_ft|floatformat:0 }} Sq.Ft.</p>
+                                                {% endif %}
+                                                {% if configuration.carpet_area_sq_ft %}
+                                                    <p class="comma-format">Carpet: {{ configuration.carpet_area_sq_ft|floatformat:0 }} Sq.Ft.</p>
+                                                {% endif %}
+                                                {% if configuration.plot_area_sq_ft %}
+                                                    <p class="comma-format">Plot: {{ configuration.plot_area_sq_ft|floatformat:0 }} Sq.Ft.</p>
+                                                {% elif configuration.plot_area_sq_yd %}
+                                                    <p class="comma-format">Plot: {{ configuration.plot_area_sq_yd|floatformat:0 }} Sq. Yd.</p>
+                                                {% endif %}
+                                                {% if configuration.office_area_sq_ft %}
+                                                    <p class="comma-format">Office: {{ configuration.office_area_sq_ft|floatformat:0 }} Sq.Ft.</p>
+                                                {% endif %}
+                                                {% if configuration.retail_area_sq_ft %}
+                                                    <p class="comma-format">Retail: {{ configuration.retail_area_sq_ft|floatformat:0 }} Sq.Ft.</p>
+                                                {% endif %}
+                                                {% if configuration.availability %}
+                                                    <p>{{ configuration.availability|title|cut:"_" }}</p>
+                                                {% endif %}
+                                                {% if configuration.possession %}
+                                                    <p>Possession: {{ configuration.possession }}</p>
+                                                {% endif %}
+                                                {% if configuration.parking %}
+                                                    <p>Parking: {{ configuration.parking }}</p>
+                                                {% endif %}
+                                                {% for feature in configuration.display_features %}
+                                                    <p>{{ feature }}</p>
+                                                {% endfor %}
                                             </div>
 
                                             <div class="configuration-price">
                                                 {% if configuration.basic_price %}
                                                     <strong class="comma-format">₹{{ configuration.basic_price|floatformat:0 }}</strong>
-                                                {% else %}
-                                                    <strong>Price not provided</strong>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -187,6 +414,7 @@
                                     {% endfor %}
                                 </div>
                             </details>
+                            <a href="{% url 'property_catalog:catalog_configuration_create' catalog.pk project.pk %}" class="catalog-btn catalog-btn-light catalog-record-action">+ Add Configuration</a>
                         </article>
                     {% empty %}
                         <p>No projects available for this developer.</p>
@@ -195,8 +423,14 @@
             </section>
         {% empty %}
             <div class="catalog-empty">
-                <h3>No developers found</h3>
-                <p>Import a catalog to display developers and projects.</p>
+                {% if has_active_filters %}
+                    <h3>No properties match these requirements</h3>
+                    <p>Try adjusting a filter or clearing your search to browse the full catalog.</p>
+                    <a href="{{ clear_filters_url }}" class="catalog-btn catalog-btn-primary">Clear filters</a>
+                {% else %}
+                    <h3>No developers found</h3>
+                    <p>Import a catalog to display developers and projects.</p>
+                {% endif %}
             </div>
         {% endfor %}
     </section>
@@ -205,4 +439,5 @@
 {% load static %}
 
 <script src="{% static 'js/number_format.js' %}"></script>
+<script src="{% static 'js/property_catalog_search.js' %}" defer></script>
 {% endblock %}

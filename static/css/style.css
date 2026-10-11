@@ -1596,7 +1596,11 @@ h1, h2, h3, .page-title, .logo strong {
 }
 
 .logout-link {
+    padding: 0;
+    border: 0;
+    background: none;
     color: var(--muted);
+    cursor: pointer;
     font-size: 12px;
     font-weight: 600;
 }
